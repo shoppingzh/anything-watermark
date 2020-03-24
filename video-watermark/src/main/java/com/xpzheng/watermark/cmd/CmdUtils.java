@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * @author xpzheng
@@ -26,8 +25,8 @@ public class CmdUtils {
         Process exec = null;
         try {
             exec = Runtime.getRuntime().exec(cmd);
-            print(exec.getInputStream(), false);
             print(exec.getErrorStream(), true);
+            print(exec.getInputStream(), false);
 
             return exec.waitFor();
         } catch (IOException e) {
@@ -47,6 +46,7 @@ public class CmdUtils {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "gbk"));
         String line = null;
         while ((line = br.readLine()) != null) {
+            @SuppressWarnings("resource")
             PrintStream ps = error ? System.err : System.out;
             ps.println(line);
         }
