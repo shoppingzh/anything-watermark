@@ -1,7 +1,7 @@
 package com.xpzheng.watermark.components;
 
 /**
- * ˮӡ
+ * 水印
  * 
  * @author xpzheng
  *
@@ -12,7 +12,7 @@ public abstract class Watermark {
     private float y;
     private float rotation;
     private float opacity;
-    private boolean front = false;
+    private boolean front;
 
     public float getX() {
         return x;
@@ -61,11 +61,11 @@ public abstract class Watermark {
 
     public static class Builder {
 
-        float x;
-        float y;
-        float rotation;
-        float opacity;
-        boolean front;
+        float x = 0;
+        float y = 0;
+        float rotation = 0;
+        float opacity = 1;
+        boolean front = true;
 
         public Builder position(float x, float y) {
             this.x = x;

@@ -5,15 +5,15 @@ import java.io.File;
 import com.xpzheng.watermark.components.Watermark;
 
 /**
- * Ë®Ó¡Éú³ÉÆ÷
+ * æ°´å°ç”Ÿæˆå™¨
  * @author xpzheng
  *
  */
 public abstract class WatermarkMaker {
 
-    private File src;
-    private File dest;
-    private Watermark watermark;
+    protected File src;
+    protected File dest;
+    protected Watermark watermark;
 
     public WatermarkMaker() {
         super();
@@ -51,10 +51,24 @@ public abstract class WatermarkMaker {
     }
 
     /**
-     * ÖÆ×÷Ë®Ó¡
+     * åˆ¶ä½œæ°´å°
      * 
      * @throws Exception
      */
     public abstract void make() throws Exception;
+    
+    /**
+     * åæ ‡è½¬æ¢
+     * @param coord
+     * @param full
+     * @return
+     */
+    public static float transCoord(float coord, float full) {
+        float ac = Math.abs(coord);
+        if (ac > 0 && ac < 1) {
+            coord = full * coord;
+        }
+        return coord < 0 ? full + coord : coord;
+    }
 
 }

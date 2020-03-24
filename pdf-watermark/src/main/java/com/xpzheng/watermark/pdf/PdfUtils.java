@@ -19,15 +19,15 @@ import com.itextpdf.text.pdf.PdfStamper;
 public class PdfUtils {
 
     /**
-     * 文字水印
+     * 锟斤拷锟斤拷水印
      * 
-     * @param pdfFile 源文件
-     * @param dest 目标文件
-     * @param text 水印内容
-     * @param x 水印x坐标
-     * @param y 水印y坐标
-     * @param rotate 旋转角度
-     * @param opacity 透明度
+     * @param pdfFile 源锟侥硷拷
+     * @param dest 目锟斤拷锟侥硷拷
+     * @param text 水印锟斤拷锟斤拷
+     * @param x 水印x锟斤拷锟斤拷
+     * @param y 水印y锟斤拷锟斤拷
+     * @param rotate 锟斤拷转锟角讹拷
+     * @param opacity 透锟斤拷锟斤拷
      * @throws Exception
      */
     public static void textWatermark(File pdfFile, String dest, String text, final float x, final float y, float rotate,
@@ -39,7 +39,7 @@ public class PdfUtils {
         }
 
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
-        Font f = new Font(BaseFont.createFont("d:/video/msyh.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED), 26);
+        Font f = new Font(BaseFont.createFont("song.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED), 26);
         Phrase p = new Phrase(text, f);
         for (int i = 1; i <= pages; i++) {
             Rectangle rect = reader.getPageSize(i);
@@ -56,24 +56,24 @@ public class PdfUtils {
             float tx = transCoord(x, width);
             float ty = height - transCoord(y, height);
 
-            // 注：设置中间对齐后，不需要计算文本宽度然后居中，会自动居中
+            // 注锟斤拷锟斤拷锟斤拷锟叫硷拷锟斤拷锟襟，诧拷锟斤拷要锟斤拷锟斤拷锟侥憋拷锟斤拷锟饺伙拷锟斤拷锟叫ｏ拷锟斤拷锟皆讹拷锟斤拷锟斤拷
             ColumnText.showTextAligned(layer, Element.ALIGN_CENTER, p, tx, ty, rotate);
         }
         stamper.close();
         reader.close();
-        System.out.println("水印生成成功！");
+        System.out.println("水印锟斤拷锟缴成癸拷锟斤拷");
     }
 
     /**
      * 图片水印
      * 
-     * @param pdfFile 源文件
-     * @param dest 目标位置
-     * @param image 图片位置
-     * @param x 水印x坐标
-     * @param y 水印y坐标
-     * @param rotate 旋转角度
-     * @param opacity 透明度
+     * @param pdfFile 源锟侥硷拷
+     * @param dest 目锟斤拷位锟斤拷
+     * @param image 图片位锟斤拷
+     * @param x 水印x锟斤拷锟斤拷
+     * @param y 水印y锟斤拷锟斤拷
+     * @param rotate 锟斤拷转锟角讹拷
+     * @param opacity 透锟斤拷锟斤拷
      * @throws Exception
      */
     public static void imageWatermark(File pdfFile, String dest, String image, final float x, final float y, float rotate,
@@ -108,16 +108,16 @@ public class PdfUtils {
         }
         stamper.close();
         reader.close();
-        System.out.println("水印生成成功！");
+        System.out.println("水印锟斤拷锟缴成癸拷锟斤拷");
     }
 
     /**
-     * 转换坐标<br>
-     * 当坐标值位于(0, 1)时，按照坐标轴长度的比例来计算，否则按照实际值计算，当坐标值小于0时，则反向取值。假设轴线长度为100，则可能出现的情况有以下几种：<br>
+     * 转锟斤拷锟斤拷锟斤拷<br>
+     * 锟斤拷锟斤拷锟斤拷值位锟斤拷(0, 1)时锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟结长锟饺的憋拷锟斤拷锟斤拷锟斤拷锟姐，锟斤拷锟斤拷锟斤拷实锟斤拷值锟斤拷锟姐，锟斤拷锟斤拷锟斤拷值小锟斤拷0时锟斤拷锟斤拷锟斤拷取值锟斤拷锟斤拷锟斤拷锟斤拷锟竭筹拷锟斤拷为100锟斤拷锟斤拷锟斤拷艹锟斤拷值锟斤拷锟斤拷锟斤拷锟斤拷锟铰硷拷锟街ｏ拷<br>
      * 0 0 0.2 20 -0.2 80 45 45 -45 55
      * 
-     * @param coord 原始坐标
-     * @param full 轴线总长度
+     * @param coord 原始锟斤拷锟斤拷
+     * @param full 锟斤拷锟斤拷锟杰筹拷锟斤拷
      * @return
      */
     private static float transCoord(float coord, float full) {

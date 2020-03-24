@@ -1,7 +1,7 @@
 package com.xpzheng.watermark.components;
 
 /**
- * ÑÕÉ«
+ * é¢œè‰²
  * @author xpzheng
  *
  */

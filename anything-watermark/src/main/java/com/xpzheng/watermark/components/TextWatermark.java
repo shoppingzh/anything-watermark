@@ -1,14 +1,14 @@
 package com.xpzheng.watermark.components;
 
 /**
- * ÎÄ×ÖË®Ó¡
+ * æ–‡å­—æ°´å°
  * @author xpzheng
  *
  */
 public class TextWatermark extends Watermark {
 
     private String content;
-    private float fontSize = 16f;
+    private float fontSize = 14f;
     private Color color = Color.valueOf(0, 0, 0, 0);
 
     public TextWatermark(String content) {
