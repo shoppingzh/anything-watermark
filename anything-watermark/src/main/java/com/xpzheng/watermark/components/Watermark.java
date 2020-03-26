@@ -1,5 +1,7 @@
 package com.xpzheng.watermark.components;
 
+import java.io.File;
+
 /**
  * 水印
  * 
@@ -10,6 +12,8 @@ public abstract class Watermark {
 
     private float x;
     private float y;
+    private Align xAlign;
+    private Align yAlign;
     private float rotation;
     private float opacity;
     private boolean front;
@@ -28,6 +32,23 @@ public abstract class Watermark {
 
     public void setY(float y) {
         this.y = y;
+    }
+
+
+    public Align getxAlign() {
+        return xAlign;
+    }
+
+    public void setxAlign(Align xAlign) {
+        this.xAlign = xAlign;
+    }
+
+    public Align getyAlign() {
+        return yAlign;
+    }
+
+    public void setyAlign(Align yAlign) {
+        this.yAlign = yAlign;
     }
 
     public float getRotation() {
@@ -54,15 +75,20 @@ public abstract class Watermark {
         this.front = front;
     }
 
+
     @Override
     public String toString() {
-        return "Watermark [x=" + x + ", y=" + y + ", rotation=" + rotation + ", opacity=" + opacity + ", front=" + front + "]";
+        return "Watermark [x=" + x + ", y=" + y + ", xAlign=" + xAlign + ", yAlign=" + yAlign + ", rotation=" + rotation
+            + ", opacity=" + opacity + ", front=" + front + "]";
     }
+
 
     public static class Builder {
 
         float x = 0;
         float y = 0;
+        Align xAlign = Align.START;
+        Align yAlign = Align.START;
         float rotation = 0;
         float opacity = 1;
         boolean front = true;
@@ -76,30 +102,46 @@ public abstract class Watermark {
         public Builder center() {
             this.x = 0.5f;
             this.y = 0.5f;
+            xAlign = Align.CENTER;
+            yAlign = Align.CENTER;
             return this;
         }
 
         public Builder leftTop() {
             this.x = 0;
-            this.y = 0.99f;
+            this.y = 0;
+            xAlign = Align.START;
+            yAlign = Align.START;
             return this;
         }
 
         public Builder leftBottom() {
             this.x = 0;
-            this.y = -0.99f;
+            this.y = 1;
+            xAlign = Align.START;
+            yAlign = Align.END;
             return this;
         }
 
         public Builder rightTop() {
-            this.x = -0.99f;
+            this.x = 1;
             this.y = 0;
+            xAlign = Align.END;
+            yAlign = Align.START;
             return this;
         }
 
         public Builder rightBottom() {
-            this.x = -0.99f;
-            this.y = -0.99f;
+            this.x = 1;
+            this.y = 1;
+            xAlign = Align.END;
+            yAlign = Align.END;
+            return this;
+        }
+
+        public Builder align(Align xAlign, Align yAlign) {
+            this.xAlign = xAlign;
+            this.yAlign = yAlign;
             return this;
         }
 
@@ -124,18 +166,29 @@ public abstract class Watermark {
             return watermark;
         }
 
+        public TextWatermark createText(String content, float textSize, Color textColor) {
+            TextWatermark watermark = createText(content);
+            watermark.setTextSize(textSize);
+            watermark.setTextColor(textColor);
+            return watermark;
+        }
+
+        public ImageWatermark createImage(String imageFilename) {
+            ImageWatermark watermark = new ImageWatermark();
+            init(watermark);
+            watermark.setFile(new File(imageFilename));
+            return watermark;
+        }
+
         private void init(Watermark watermark) {
             watermark.x = this.x;
             watermark.y = this.y;
+            watermark.xAlign = this.xAlign;
+            watermark.yAlign = this.yAlign;
             watermark.rotation = this.rotation;
             watermark.opacity = this.opacity;
             watermark.front = this.front;
         }
-    }
-
-    public static void main(String[] args) {
-        Watermark watermark = new Watermark.Builder().center().opactiy(0.5f).createText("Hello, world!");
-        System.out.println(watermark);
     }
 
 }

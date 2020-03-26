@@ -5,23 +5,30 @@ import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 
 import com.xpzheng.watermark.components.Watermark;
+import com.xpzheng.watermark.maker.ImageWatermarkMaker;
 import com.xpzheng.watermark.maker.PdfWatermarkMaker;
+import com.xpzheng.watermark.maker.VideoWatermarkMaker;
 
-public class WatermarkUtils {
+/**
+ * 万物皆可水印门面工具类
+ * @author xpzheng
+ *
+ */
+public class AnythingWatermark {
 
     private static final String[] PDF_SUFFIX = { "pdf" };
-    private static final String[] VIDEO_SUFFIX = { "mp4" };
-    private static final String[] IMAGE_SUFFIX = { "jpg", "jpeg" };
+    private static final String[] VIDEO_SUFFIX = { "mp4", "flv" };
+    private static final String[] IMAGE_SUFFIX = { "jpg", "jpeg", "png", "gif" };
 
     /**
      * 为某个文件添加水印
      * 
-     * @param src       源文件
-     * @param dest      目标文件
+     * @param src 源文件
+     * @param dest 目标文件
      * @param watermark 水印
      * @throws Exception
      */
-    public static void watermark(File src, File dest, Watermark watermark) throws Exception {
+    public static void make(File src, File dest, Watermark watermark) throws WatermarkException {
         if (src == null || !src.exists()) {
             throw new IllegalArgumentException("源文件不存在！");
         }
@@ -29,16 +36,20 @@ public class WatermarkUtils {
         boolean pdf = canWatermark(filename, PDF_SUFFIX);
         boolean video = canWatermark(filename, VIDEO_SUFFIX);
         boolean image = canWatermark(filename, IMAGE_SUFFIX);
+        WatermarkMaker maker = null;
         if (pdf) {
-            new PdfWatermarkMaker(src, dest, watermark).make();
+            maker = new PdfWatermarkMaker(src, dest);
         } else if (video) {
-            
+            maker = new VideoWatermarkMaker(src, dest);
         } else if (image) {
-            
-        } else {
-            throw new RuntimeException("该类型的文件无法添加水印！");
+            maker = new ImageWatermarkMaker(src, dest, ImageWatermarkMaker.FORMAT_JPG);
         }
-        
+
+        if (maker == null) {
+            throw new WatermarkException(WatermarkException.ERR_UNSUPPORTED);
+        }
+
+        maker.make(watermark);
     }
 
     private static boolean canWatermark(String filename, String[] suffixes) {
@@ -50,6 +61,5 @@ public class WatermarkUtils {
         }
         return false;
     }
-    
 
 }

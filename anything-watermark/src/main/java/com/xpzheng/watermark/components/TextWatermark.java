@@ -2,14 +2,15 @@ package com.xpzheng.watermark.components;
 
 /**
  * 文字水印
+ * 
  * @author xpzheng
  *
  */
 public class TextWatermark extends Watermark {
 
     private String content;
-    private float fontSize = 14f;
-    private Color color = Color.valueOf(0, 0, 0, 0);
+    private float textSize = 14f;
+    private Color textColor = Color.valueOf(0, 0, 0, 0);
 
     public TextWatermark(String content) {
         super();
@@ -19,14 +20,14 @@ public class TextWatermark extends Watermark {
     public TextWatermark(String content, float fontSize) {
         super();
         this.content = content;
-        this.fontSize = fontSize;
+        this.textSize = fontSize;
     }
 
     public TextWatermark(String content, float fontSize, Color color) {
         super();
         this.content = content;
-        this.fontSize = fontSize;
-        this.color = color;
+        this.textSize = fontSize;
+        this.textColor = color;
     }
 
     public String getContent() {
@@ -37,27 +38,20 @@ public class TextWatermark extends Watermark {
         this.content = content;
     }
 
-    public float getFontSize() {
-        return fontSize;
+    public float getTextSize() {
+        return textSize;
     }
 
-    public void setFontSize(float fontSize) {
-        this.fontSize = fontSize;
+    public void setTextSize(float textSize) {
+        this.textSize = textSize;
     }
 
-    public Color getColor() {
-        return color;
+    public Color getTextColor() {
+        return textColor;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    @Override
-    public String toString() {
-        return "TextWatermark [content=" + content + ", fontSize=" + fontSize + ", color=" + color + ", getX()=" + getX()
-            + ", getY()=" + getY() + ", getRotation()=" + getRotation() + ", getOpacity()=" + getOpacity() + ", isFront()="
-            + isFront() + "]";
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
     }
 
 }

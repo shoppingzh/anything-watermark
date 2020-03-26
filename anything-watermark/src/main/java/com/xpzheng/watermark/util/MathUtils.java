@@ -1,0 +1,43 @@
+package com.xpzheng.watermark.util;
+
+public class MathUtils {
+
+    /**
+     * 根据用户设定坐标及坐标轴长度计算实际坐标位置<br>
+     * coord参数可设置为正数或负数，正数表示从坐标轴起点开始计算，负数表示从坐标轴终点计算； 当coord为(0, 1)或(-1, 0)之间的小数时，表示使用比例计算实际坐标的位置。<br>
+     * 以坐标轴长度为100为例，coord的取值与实际坐标的对应关系如下：<br>
+     * 0 = 0<br>
+     * 40 = 40<br>
+     * -40 = 60<br>
+     * 0.3 = 30<br>
+     * -0.3 = 70<br>
+     * 
+     * @param coord 用户设定坐标
+     * @param full 坐标轴总长
+     * @return
+     */
+    public static float transCoord(float coord, float full) {
+        float ac = Math.abs(coord);
+        if (ac > 0 && ac <= 1) {
+            coord = full * coord;
+        }
+        return coord < 0 ? full + coord : coord;
+    }
+    
+    /**
+     * 矫正坐标，防止坐标超出坐标轴范围<br>
+     * @param coord 坐标
+     * @param full 坐标轴最大长度
+     * @return
+     */
+    public static final float adjustCoord(float coord, float full) {
+        if (coord < 0) {
+            coord = 0;
+        }
+        if (coord > full) {
+            coord = full;
+        }
+        return coord;
+    }
+
+}
