@@ -11,7 +11,7 @@
         <Upload
           v-if="step === 0"
           type="drag"
-          action="//jsonplaceholder.typicode.com/posts/"
+          action="http://localhost/file/upload"
           :on-success="handleUploaded">
             <div style="padding: 60px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
@@ -24,6 +24,7 @@
       </div>
       <div v-show="step === 1" class="steps__item">
         <watermark-designer
+          ref="designer"
           @designEnd="handleDesignEnd"></watermark-designer>
       </div>
       <div v-show="step === 2" class="steps__item">
@@ -37,6 +38,7 @@
 <script>
 
 import WatermarkDesigner from './components/WatermarkDesigner'
+import http from '@/utils/http'
 
 export default {
   name: 'App',
@@ -45,15 +47,27 @@ export default {
   },
   data() {
     return {
-      step: 0
+      step: 0,
+      src: null
     }
   },
   methods: {
-    handleUploaded() {
+    handleUploaded(resp) {
       this.step = 1;
+      if (resp.success) {
+        this.src = resp.data
+      }
     },
     handleDesignEnd() {
-      this.step = 2;
+      http({
+        url: '/watermark/generate',
+        method: 'post',
+        params: Object.assign({
+          src: this.src
+        }, this.$refs.designer.config())
+      }).then((data) => {
+        console.log(data)
+      })
     }
   }
 }

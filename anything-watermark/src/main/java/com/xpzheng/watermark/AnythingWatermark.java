@@ -18,7 +18,7 @@ public class AnythingWatermark {
 
     private static final String[] PDF_SUFFIX = { "pdf" };
     private static final String[] VIDEO_SUFFIX = { "mp4", "flv" };
-    private static final String[] IMAGE_SUFFIX = { "jpg", "jpeg", "png", "gif" };
+    private static final String[] IMAGE_SUFFIX = { "jpg", "jpeg", "webp", "png", "gif" };
 
     /**
      * 为某个文件添加水印
