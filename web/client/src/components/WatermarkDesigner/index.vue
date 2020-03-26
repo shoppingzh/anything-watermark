@@ -6,7 +6,7 @@
           <div id="watermark" :style="styles">
             <div v-if="type == 1">{{ text }}</div>
             <div v-else-if="type == 2">
-              hhaha
+              
             </div>
           </div>
         </div>
@@ -34,6 +34,9 @@
           <FormItem label="透明度">
             <Slider v-model="opacity" :min="0" :max="100" :step="1"></Slider>
           </FormItem>
+          <FormItem>
+            <Button type="primary" long>好了 <Icon type="md-arrow-round-forward" @click="$emit('designEnd')" /></Button>
+          </FormItem>
         </Form>
       </i-col>
     </Row>
@@ -49,18 +52,29 @@ export default {
       textColor: '#000',
       textSize: 14,
       rotation: 0,
-      opacity: 100
+      opacity: 100,
+      x: 150,
+      y: 120
     }
   },
   computed: {
     styles: function() {
-      return { transform: `rotate(${this.rotation}deg)`, opacity: this.opacity / 100, color: this.textColor, fontSize: this.textSize + 'px' };
+      return {
+        transform: `rotate(${this.rotation}deg)`,
+        opacity: this.opacity / 100,
+        color: this.textColor,
+        fontSize: this.textSize + 'px',
+        left: this.x + 'px',
+        top: this.y + 'px'
+      };
     }
+  },
+  methods: {
   }
 }
 </script>
 
 <style scoped>
   .preview-box{ height: 500px; background-color: #f3f4f7; border: 1px solid #eee; border-radius: 5px; position: relative }
-  #watermark{ min-width: 80px; min-height: 40px; background-color: rgba(122, 122, 122, .15); border: 1px solid #ccc; position: absolute; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+  #watermark{ min-width: 80px; min-height: 40px; padding: 3px 5px; background-color: rgba(65, 65, 65, .05); border: 1px solid #ddd; position: absolute; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
 </style>
