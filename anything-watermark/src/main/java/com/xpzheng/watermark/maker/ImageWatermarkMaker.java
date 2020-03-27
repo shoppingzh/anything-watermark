@@ -21,6 +21,12 @@ import com.xpzheng.watermark.components.TextWatermark;
 import com.xpzheng.watermark.components.Watermark;
 import com.xpzheng.watermark.util.MathUtils;
 
+/**
+ * 图片水印生成器
+ * 
+ * @author xpzheng
+ *
+ */
 public class ImageWatermarkMaker extends AbstractWatermarkMaker {
 
     public static final String FORMAT_PNG = "png";
@@ -31,6 +37,16 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
      * 当水印贴边时与边缘的留白距离
      */
     private static final float EDGE_OFFSET = 15;
+
+    /**
+     * 文字水印最小高度占比
+     */
+    private static final float MIN_TEXT_PERCENT = 0.035f;
+
+    /**
+     * 文字水印最大高度占比
+     */
+    private static final float MAX_TEXT_PERCENT = 0.2f;
 
     private static Font BASEFONT;
 
@@ -77,8 +93,21 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
             if (watermark instanceof TextWatermark) {
                 TextWatermark textWatermark = (TextWatermark) watermark;
                 final String text = textWatermark.getContent();
-                Font f = new Font(BASEFONT.getName(), Font.PLAIN, (int) textWatermark.getTextSize()); // 字体样式、大小
+                float textSize = textWatermark.getTextSize();
+                Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) textSize); // 字体样式、大小
                 g.setFont(f);
+                // 计算该字体绘制出的水印高度，如果不足最小高度(或大于最大高度)，则自动伸缩到最佳高度
+                Rectangle2D originalBounds = g.getFontMetrics(f).getStringBounds(text, g);
+                double percent = originalBounds.getHeight() / Math.min(mw, mh);
+                if (percent < MIN_TEXT_PERCENT) {
+                    f = new Font(f.getName(), Font.BOLD, (int) (textSize * MIN_TEXT_PERCENT / percent));
+                    g.setFont(f);
+                }
+                if (percent > MAX_TEXT_PERCENT) {
+                    f = new Font(f.getName(), Font.BOLD, (int) (textSize * MAX_TEXT_PERCENT / percent));
+                    g.setFont(f);
+                }
+
                 Color textColor = textWatermark.getTextColor();
                 g.setColor(new java.awt.Color(textColor.getR(), textColor.getG(), textColor.getB(), textColor.getA())); // 文字颜色
                 // 计算文本的绘制坐标
@@ -142,7 +171,7 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
                 }
                 // 旋转画笔
                 g.rotate(Math.toRadians(imageWatermark.getRotation()), tx + iw / 2, ty + ih / 2);
-                g.drawImage(mask, (int) tx, (int) ty, (int) iw, (int) ih, null);
+                g.drawImage(mask, (int) tx, (int) ty, (int) iw / 5, (int) ih / 5, null);
             }
             g.dispose(); // 释放内存
             ImageIO.write(img, this.format, this.dest); // 写出

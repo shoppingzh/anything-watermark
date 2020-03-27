@@ -10,10 +10,16 @@ import java.io.File;
  */
 public abstract class Watermark {
 
+    /**
+     * 水印的最小尺寸
+     */
+    public static final float MIN_SIZE = 0.01f;
+
     private float x;
     private float y;
     private Align xAlign;
     private Align yAlign;
+    private float size;
     private float rotation;
     private float opacity;
     private boolean front;
@@ -34,7 +40,6 @@ public abstract class Watermark {
         this.y = y;
     }
 
-
     public Align getxAlign() {
         return xAlign;
     }
@@ -49,6 +54,14 @@ public abstract class Watermark {
 
     public void setyAlign(Align yAlign) {
         this.yAlign = yAlign;
+    }
+
+    public float getSize() {
+        return size;
+    }
+
+    public void setSize(float size) {
+        this.size = size;
     }
 
     public float getRotation() {
@@ -75,13 +88,11 @@ public abstract class Watermark {
         this.front = front;
     }
 
-
     @Override
     public String toString() {
         return "Watermark [x=" + x + ", y=" + y + ", xAlign=" + xAlign + ", yAlign=" + yAlign + ", rotation=" + rotation
             + ", opacity=" + opacity + ", front=" + front + "]";
     }
-
 
     public static class Builder {
 
@@ -89,6 +100,7 @@ public abstract class Watermark {
         float y = 0;
         Align xAlign = Align.START;
         Align yAlign = Align.START;
+        float size = Watermark.MIN_SIZE;
         float rotation = 0;
         float opacity = 1;
         boolean front = true;
@@ -145,6 +157,11 @@ public abstract class Watermark {
             return this;
         }
 
+        public Builder size(float size) {
+            this.size = size;
+            return this;
+        }
+
         public Builder rotate(float rotation) {
             this.rotation = rotation;
             return this;
@@ -160,16 +177,23 @@ public abstract class Watermark {
             return this;
         }
 
+        // Build Watermark
+
         public TextWatermark createText(String content) {
             TextWatermark watermark = new TextWatermark(content);
             init(watermark);
             return watermark;
         }
 
-        public TextWatermark createText(String content, float textSize, Color textColor) {
+        public TextWatermark createText(String content, Color textColor) {
             TextWatermark watermark = createText(content);
-            watermark.setTextSize(textSize);
             watermark.setTextColor(textColor);
+            return watermark;
+        }
+
+        public TextWatermark createText(String content, float textSize, Color textColor) {
+            TextWatermark watermark = createText(content, textColor);
+            watermark.setTextSize(textSize);
             return watermark;
         }
 
@@ -185,6 +209,7 @@ public abstract class Watermark {
             watermark.y = this.y;
             watermark.xAlign = this.xAlign;
             watermark.yAlign = this.yAlign;
+            watermark.size = this.size;
             watermark.rotation = this.rotation;
             watermark.opacity = this.opacity;
             watermark.front = this.front;
