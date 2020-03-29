@@ -1,5 +1,6 @@
 package com.xpzheng.watermark.maker;
 
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,6 +20,7 @@ import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.xpzheng.watermark.AbstractWatermarkMaker;
+import com.xpzheng.watermark.TextGrowable;
 import com.xpzheng.watermark.WatermarkException;
 import com.xpzheng.watermark.components.Align;
 import com.xpzheng.watermark.components.Color;
@@ -33,7 +35,7 @@ import com.xpzheng.watermark.util.MathUtils;
  * @author xpzheng
  *
  */
-public class PdfWatermarkMaker extends AbstractWatermarkMaker {
+public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGrowable {
 
     public PdfWatermarkMaker() {
         super();
@@ -55,21 +57,23 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker {
                 // 这里直接返回，不要抛错，给0页的pdf加水印，不加即为成功
                 return;
             }
+            final float size = watermark.getSize();
             stamper = new PdfStamper(reader, new FileOutputStream(this.dest));
             if (watermark instanceof TextWatermark) {
                 TextWatermark textWatermark = (TextWatermark) watermark;
+                float textSize = getBaseFontSize() * (1 + size * getFontSizeGrowFactor());
                 Font f = new Font(BaseFont.createFont("song.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED),
-                    textWatermark.getTextSize()); // 字体与字体大小
+                        textSize); // 字体与字体大小
                 Color textColor = textWatermark.getTextColor();
                 f.setColor(textColor.getR(), textColor.getG(), textColor.getB()); // 字体颜色
                 Phrase p = new Phrase(textWatermark.getContent(), f);
-
                 for (int i = 1; i <= pages; i++) {
                     Rectangle rect = reader.getPageSize(i);
                     final float mw = rect.getWidth();
                     final float mh = rect.getHeight();
 
-                    PdfContentByte layer = textWatermark.isFront() ? stamper.getOverContent(i) : stamper.getUnderContent(i); // 前置/后置
+                    PdfContentByte layer = textWatermark.isFront() ? stamper.getOverContent(i)
+                            : stamper.getUnderContent(i); // 前置/后置
                     float opacity = textWatermark.getOpacity(); // 透明度
                     if (opacity < 1) {
                         PdfGState gs = new PdfGState();
@@ -80,7 +84,7 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker {
                     float tx = MathUtils.transCoord(textWatermark.getX(), mw);
                     float ty = mh - MathUtils.transCoord(textWatermark.getY(), mh); // pdf的坐标原点在左下角，此处要作坐标变换
                     // FIXME 高度计算的方法有待改进
-                    float tw = ColumnText.getWidth(p), th = textWatermark.getTextSize();
+                    float tw = ColumnText.getWidth(p), th = textSize;
                     Align xAlign = textWatermark.getxAlign(), yAlign = textWatermark.getyAlign();
                     if (xAlign == Align.CENTER) {
                         tx = tx - tw / 2;
@@ -112,8 +116,11 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker {
                     Rectangle rect = reader.getPageSize(i);
                     final float mw = rect.getWidth();
                     final float mh = rect.getHeight();
+                    float tx = MathUtils.transCoord(imageWatermark.getX(), mw);
+                    float ty = mh - MathUtils.transCoord(imageWatermark.getY(), mh);
 
-                    PdfContentByte layer = imageWatermark.isFront() ? stamper.getOverContent(i) : stamper.getUnderContent(i);
+                    PdfContentByte layer = imageWatermark.isFront() ? stamper.getOverContent(i)
+                            : stamper.getUnderContent(i);
                     float opacity = imageWatermark.getOpacity();
                     if (opacity < 1) {
                         PdfGState gs = new PdfGState();
@@ -121,10 +128,12 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker {
                         layer.setGState(gs);
                     }
 
+                    // 获取图片的绘制尺寸
                     Image img = Image.getInstance(imageWatermark.getFile().getAbsolutePath());
-                    float iw = img.getScaledWidth(), ih = img.getScaledHeight();
-                    float tx = MathUtils.transCoord(imageWatermark.getX(), mw);
-                    float ty = mh - MathUtils.transCoord(imageWatermark.getY(), mh);
+                    Rectangle2D bounds = MathUtils.getScaleBounds(mw, mh, img.getScaledWidth(), img.getScaledHeight(),
+                            size);
+                    float iw = (float) bounds.getWidth(), ih = (float) bounds.getHeight();
+
                     Align xAlign = imageWatermark.getxAlign(), yAlign = imageWatermark.getyAlign();
                     if (xAlign == Align.CENTER) {
                         tx = tx - iw / 2;
@@ -145,7 +154,7 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker {
                     if (ty <= 0) {
                         ty = this.edgeOffset;
                     } else if (ty + ih >= mh) {
-                        ty = mh - this.edgeOffset;
+                        ty = mh - ih - this.edgeOffset;
                     }
                     layer.addImage(img, iw, 0, 0, ih, tx, ty);
                 }
@@ -173,4 +182,23 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker {
 
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.xpzheng.watermark.TextGrowable#getBaseFontSize()
+     */
+    @Override
+    public float getBaseFontSize() {
+        return 12f;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.xpzheng.watermark.TextGrowable#getFontSizeGrowFactor()
+     */
+    @Override
+    public float getFontSizeGrowFactor() {
+        return 8f;
+    }
 }

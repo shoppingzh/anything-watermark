@@ -3,10 +3,11 @@
     <Row>
       <i-col span="16">
         <div ref="box" class="preview-box">
-          <div ref="watermark" id="watermark" :style="styles">
-            <div v-if="conf.type == 1" style="white-space: nowrap;">{{ conf.text }}</div>
+          <slot name="container"></slot>
+          <div class="watermark" :style="styles">
+            <span ref="watermark" v-if="conf.type == 1" style="white-space: nowrap;">{{ conf.text }}</span>
             <div v-else-if="conf.type == 2">
-              <img v-if="conf.image" :src="conf.image">
+              <img ref="watermark" v-if="conf.image" :src="imageUrl">
             </div>
           </div>
         </div>
@@ -27,13 +28,9 @@
             <template #label><Icon type="ios-document-outline" /> 文字颜色</template>
             <ColorPicker v-model="conf.textColor" alpha :colors="['#333', '#666', '#999', '#aaa', '#bbb', '#ccc', '#ddd']"/>
           </FormItem>
-          <FormItem v-show="conf.type == 1">
-            <template #label><Icon type="ios-document-outline" /> 字体大小</template>
-            <InputNumber :max="40" :min="10" :step="2" v-model="conf.textSize" ></InputNumber>
-          </FormItem>
           <FormItem v-show="conf.type == 2">
             <template #label><Icon type="md-image" /> 水印图片</template>
-            <Upload action="">
+            <Upload action="http://localhost/file/upload" :on-success="handleImageUploaded">
                 <Button icon="ios-cloud-upload-outline">选择文件</Button>
             </Upload>
           </FormItem>
@@ -41,20 +38,59 @@
           <FormItem label="快捷设置">
             <Button type="success" ghost @click="handleFastDesign"><Icon type="ios-hammer-outline" /> 打开快捷设置面板</Button>
           </FormItem>
-          <FormItem label="横轴位置">
+          <FormItem label="水印大小">
+            <Slider v-model="conf.size" :min="1" :max="100"></Slider>
+          </FormItem>
+          <FormItem label="水印位置">
+            <Row type="flex">
+              <i-col :span="8">
+                <Button @click="handlePosLeftTop">左上</Button>
+              </i-col>
+              <i-col :span="8">
+              </i-col>
+              <i-col :span="8">
+                <Button @click="handlePosRightTop">右上</Button>
+              </i-col>
+            </Row>
+            <Row type="flex">
+              <i-col :span="8">
+              </i-col>
+              <i-col :span="8">
+                <Button @click="handlePosCenter">中间</Button>
+              </i-col>
+              <i-col :span="8">
+              </i-col>
+            </Row>
+            <Row type="flex">
+              <i-col :span="8">
+                <Button @click="handlePosLeftBottom">左下</Button>
+              </i-col>
+              <i-col :span="8">
+              </i-col>
+              <i-col :span="8">
+                <Button @click="handlePosRightBottom">右下</Button>
+              </i-col>
+            </Row>
+            <p style="margin-top: 5px;">
+              <Button type="warning" size="small" ghost style="border: none;" @click="positionSetting = !positionSetting">
+                <Icon type="md-cog" /> {{positionSetting ? '收起' : ''}}高级设置
+              </Button> 
+            </p>
+          </FormItem>
+          <FormItem v-show="positionSetting" label="横轴位置">
             <Slider v-model="xOffset" :min="0" :max="100" :step="1" show-input></Slider>
           </FormItem>
-          <FormItem label="横轴对齐方式">
+          <FormItem v-show="positionSetting" label="横轴对齐方式">
             <RadioGroup v-model="conf.xAlign">
               <Radio :label="1">左</Radio>
               <Radio :label="0.5">中</Radio>
               <Radio :label="0">右</Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="纵轴位置">
+          <FormItem v-show="positionSetting" label="纵轴位置">
             <Slider v-model="yOffset" :min="0" :max="100" :step="1" show-input></Slider>
           </FormItem>
-          <FormItem label="纵轴对齐方式">
+          <FormItem v-show="positionSetting" label="纵轴对齐方式">
             <RadioGroup v-model="conf.yAlign">
               <Radio :label="1">上</Radio>
               <Radio :label="0.5">中</Radio>
@@ -92,12 +128,18 @@
         </Modal>
       </i-col>
     </Row>
-    
+    <!-- 专门用来计算文字高度的 -->
+    <div style="position: fixed; top: 0; left: 0; margin-left: -100%; margin-top: -100%;">
+      <span ref="textTemplate" style="font-size: 12px;">{{ conf.text }}</span>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    
+  },
   data() {
     return {
       conf: {
@@ -106,14 +148,15 @@ export default {
         y: 0,
         xAlign: 0,
         yAlign: 0,
+        size: 5,
         rotation: 0,
         opacity: 100,
         text: '内部使用，请勿盗版！',
         textColor: '#000',
-        textSize: 14,
-        image: 'https://avatars2.githubusercontent.com/u/18109723?s=460&u=7cdf35a8819de78fe3b0c2611b66967082f519ac&v=4'
+        image: null
       },
-      fast: false
+      fast: false,
+      positionSetting: false
     }
   },
   computed: {
@@ -133,22 +176,46 @@ export default {
         this.conf.y = val / 100
       }
     },
+    imageUrl() {
+      const image = this.conf.image
+      return image ? `http://localhost/upload/${image}` : null
+    },
     styles: function() {
+      
       const conf = this.conf
-      const box = this.$refs.box
-      const watermark = this.$refs.watermark
-      const x = conf.x, y = conf.y
-      const xa = conf.xAlign, ya = conf.yAlign
       // 文字影响宽度，在这里给个引用，保证能更新位置
-      this.conf.type
       this.conf.text
       this.conf.image
+      const type = conf.type
+      const box = this.$refs.box
+      const watermark = this.$refs.watermark
+      const size = conf.size
+      const scale = size / 500
+      const x = conf.x, y = conf.y
+      const xa = conf.xAlign, ya = conf.yAlign
       
       let left = 0, top = 0
       if (box && watermark) { // 防止DOM没有准备好
         const mw = box.offsetWidth, mh = box.offsetHeight
-        const w = watermark.offsetWidth, h = watermark.offsetHeight
+        const ow = watermark.offsetWidth, oh = watermark.offsetHeight
+        let w = ow, h = oh
+        if (type == 1) {
+          const template = this.$refs.textTemplate
+          if (template) {
+            const th = template.offsetHeight
+            watermark.style.fontSize = Math.min(mh, mw) * scale * 12 / th + 'px'
+          }
+          
+        } else if (type == 2) {
+          const ratio = ow / oh
+          
+          h = Math.sqrt(mw * mh * scale / ratio)
+          w = h * ratio
+          watermark.style.width = w + 'px'
+          watermark.style.height = h + 'px'
+        }
 
+        // 位置
         left = mw * x
         top = mh * y
         // 计算偏移量
@@ -159,11 +226,12 @@ export default {
         transform: `rotate(${conf.rotation}deg)`,
         opacity: conf.opacity / 100,
         color: conf.textColor,
-        fontSize: conf.textSize + 'px',
         left: left + 'px',
-        top: top + 'px'
+        top: top + 'px',
       };
     }
+  },
+  watch: {
   },
   mounted() {
   },
@@ -171,13 +239,54 @@ export default {
     config() {
       return Object.assign({}, this.conf);
     },
+    // 水印图片上传完成
+    handleImageUploaded(resp) {
+      if (resp.success) {
+        this.conf.image = resp.data
+        this.conf.size = 8
+      }
+    },
     handleFastDesign() {
       this.fast = true
+    },
+    handlePosLeftTop() {
+      const conf = this.conf
+      conf.x = 0
+      conf.y = 0
+      conf.xAlign = 0
+      conf.yAlign = 1
+    },
+    handlePosRightTop() {
+      const conf = this.conf
+      conf.x = 1
+      conf.y = 0
+      conf.xAlign = 1
+      conf.yAlign = 0
+    },
+    handlePosCenter() {
+      const conf = this.conf
+      conf.x = 0.5
+      conf.y = 0.5
+      conf.xAlign = 0.5
+      conf.yAlign = 0.5
+    },
+    handlePosLeftBottom() {
+      const conf = this.conf
+      conf.x = 0
+      conf.y = 1
+      conf.xAlign = 0
+      conf.yAlign = 1
+    },
+    handlePosRightBottom() {
+      const conf = this.conf
+      conf.x = 1
+      conf.y = 1
+      conf.xAlign = 1
+      conf.yAlign = 1
     },
     handleFastPdf1() {
       this.fast = false
       const conf = this.conf
-      conf.textSize = 24
       conf.x = 0.5
       conf.y = 0.5
       conf.xAlign = 0.5
@@ -196,7 +305,6 @@ export default {
       conf.rotation = 0
       conf.opacity = 50
       conf.textColor = '#ccc'
-      conf.textSize = 16
     },
     handleFastVideo1() {
       this.fast = false
@@ -208,12 +316,10 @@ export default {
       conf.rotation = 0
       conf.opacity = 50
       conf.textColor = '#666'
-      conf.textSize = 16
     },
     handleFastImage1() {
       this.fast = false
       const conf = this.conf
-      conf.textSize = 14
       conf.x = 0.5
       conf.y = 1
       conf.xAlign = 0.5
@@ -234,8 +340,8 @@ export default {
 </script>
 
 <style scoped>
-  .preview-box{ height: 500px; background-color: #f3f4f7; border: 1px solid #eee; border-radius: 5px; position: relative }
-  #watermark{ min-width: 50px; min-height: 30px; padding: 3px 5px; overflow: hidden; transition: all .2s; position: absolute; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+  .preview-box{ min-height: 500px; padding: 10px; background-color: #f3f4f7; border: 1px solid #eee; border-radius: 5px; position: relative; }
+  .watermark{ overflow: hidden; transition: all .2s; position: absolute; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
   @keyframes ani-bling {
     0% { border: 1px solid transparent; }
     50% { border: 1px solid #ccc; }

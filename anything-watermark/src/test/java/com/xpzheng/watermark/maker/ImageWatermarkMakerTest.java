@@ -1,20 +1,20 @@
-//package com.xpzheng.watermark.maker;
-//
-//import java.io.File;
-//
-//import org.apache.commons.io.FilenameUtils;
-//import org.junit.jupiter.api.Test;
-//
-//import com.xpzheng.watermark.components.Align;
-//import com.xpzheng.watermark.components.Color;
-//import com.xpzheng.watermark.components.TextWatermark;
-//import com.xpzheng.watermark.components.Watermark;
-//
-//public class ImageWatermarkMakerTest {
-//    
-//    private static final String BASE_PATH = "d:/watermark/image/";
-//    private static final File SRC = new File(BASE_PATH + "1.jpg");
-//    
+package com.xpzheng.watermark.maker;
+
+import java.io.File;
+
+import org.apache.commons.io.FilenameUtils;
+import org.junit.jupiter.api.Test;
+
+import com.xpzheng.watermark.components.Align;
+import com.xpzheng.watermark.components.Color;
+import com.xpzheng.watermark.components.TextWatermark;
+import com.xpzheng.watermark.components.Watermark;
+
+public class ImageWatermarkMakerTest {
+    
+    private static final String BASE_PATH = "d:/watermark/image/";
+    private static final File SRC = new File(BASE_PATH + "1.jpg");
+    
 //    @Test
 //    public void testFullDemo() {
 //        Watermark watermark = new Watermark.Builder()
@@ -128,26 +128,31 @@
 //        watermark.setTextSize(200);
 //        new ImageWatermarkMaker(SRC, new File(BASE_PATH + "1-fontSize-200.jpg")).make(watermark);
 //    }
-//    
-//    public void testDifferentSize() {
-//        Watermark watermark = new Watermark.Builder()
-//            .rightBottom()
-//            .createText("夜空中最亮的星 zxp", 12, Color.valueOf(255, 255, 255, 255));
-//        File path = new File(BASE_PATH + "size");
-//        File outDir = new File(BASE_PATH + "size/output");
-//        if (!outDir.exists()) {
-//            outDir.mkdirs();
-//        }
-//        File[] files = path.listFiles();
-//        if (files.length > 0) {
-//            for (File file : files) {
-//                if (file.isDirectory()) {
-//                    continue;
-//                }
-//                String filename = FilenameUtils.getBaseName(file.getName()) + "-text." + FilenameUtils.getExtension(file.getName());
-//                new ImageWatermarkMaker(file, new File(outDir, filename), ImageWatermarkMaker.FORMAT_JPG).make(watermark);
-//            }
-//        }
-//    }
-//    
-//}
+    
+    public void testDifferentSize() {
+        Watermark watermark = new Watermark.Builder()
+//            .position(0.5f, 0.5f)
+//            .align(Align.CENTER, Align.CENTER)
+            .rightBottom()
+            .opactiy(0.5f)
+            .size(0.01f)
+            .createImage("d:/1.png");
+//            .createText("夜", 12, Color.valueOf(255, 255, 255, 255));
+        File path = new File(BASE_PATH + "size");
+        File outDir = new File(BASE_PATH + "size/output");
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }
+        File[] files = path.listFiles();
+        if (files.length > 0) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    continue;
+                }
+                String filename = FilenameUtils.getBaseName(file.getName()) + "-text." + FilenameUtils.getExtension(file.getName());
+                new ImageWatermarkMaker(file, new File(outDir, filename), ImageWatermarkMaker.FORMAT_JPG).make(watermark);
+            }
+        }
+    }
+    
+}

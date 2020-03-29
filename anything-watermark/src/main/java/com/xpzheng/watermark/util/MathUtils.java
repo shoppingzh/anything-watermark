@@ -1,5 +1,7 @@
 package com.xpzheng.watermark.util;
 
+import java.awt.geom.Rectangle2D;
+
 public class MathUtils {
 
     /**
@@ -38,6 +40,34 @@ public class MathUtils {
             coord = full;
         }
         return coord;
+    }
+    
+    /**
+     * 
+     * @param cw  container width
+     * @param ch container height
+     * @param w box width
+     * @param h box height
+     * @param scale scale degree
+     * @return
+     */
+    public static Rectangle2D getScaleBounds(float cw, float ch, float w, float h, float scale) {
+        float ratio = w / h;
+        double th = Math.sqrt(cw * ch * scale / ratio);
+        Rectangle2D.Double rec = new Rectangle2D.Double(0, 0, th * ratio, th);
+        return rec;
+    }
+    
+    /**
+     * 
+     * @param container 
+     * @param target
+     * @param scale
+     * @return
+     */
+    public static Rectangle2D getScaleBounds(Rectangle2D container, Rectangle2D target, float scale) {
+        return getScaleBounds((float) container.getWidth(), (float) container.getHeight(), (float) target.getWidth(),
+                (float) target.getHeight(), scale);
     }
 
 }

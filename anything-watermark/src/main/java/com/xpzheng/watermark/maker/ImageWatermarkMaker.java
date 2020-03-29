@@ -88,25 +88,27 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
             float x = watermark.getX(), y = watermark.getY();
             Align xAlign = watermark.getxAlign(), yAlign = watermark.getyAlign();
             float tx = MathUtils.transCoord(x, mw), ty = MathUtils.transCoord(y, mh);
+            float size = watermark.getSize();
 
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, watermark.getOpacity())); // 透明度(使用组合像素的方式)
             if (watermark instanceof TextWatermark) {
                 TextWatermark textWatermark = (TextWatermark) watermark;
                 final String text = textWatermark.getContent();
                 float textSize = textWatermark.getTextSize();
-                Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) textSize); // 字体样式、大小
+                Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) 12); // 字体样式、大小
                 g.setFont(f);
                 // 计算该字体绘制出的水印高度，如果不足最小高度(或大于最大高度)，则自动伸缩到最佳高度
+                if (size  < MIN_TEXT_PERCENT) {
+                    size = MIN_TEXT_PERCENT;
+                }
+                if (size  > MAX_TEXT_PERCENT) {
+                    size = MAX_TEXT_PERCENT;
+                }
+                final float textHeight = Math.min(mw, mh) * size;
                 Rectangle2D originalBounds = g.getFontMetrics(f).getStringBounds(text, g);
-                double percent = originalBounds.getHeight() / Math.min(mw, mh);
-                if (percent < MIN_TEXT_PERCENT) {
-                    f = new Font(f.getName(), Font.BOLD, (int) (textSize * MIN_TEXT_PERCENT / percent));
-                    g.setFont(f);
-                }
-                if (percent > MAX_TEXT_PERCENT) {
-                    f = new Font(f.getName(), Font.BOLD, (int) (textSize * MAX_TEXT_PERCENT / percent));
-                    g.setFont(f);
-                }
+                textSize = (float) (textSize * textHeight / originalBounds.getHeight());
+                f = new Font(f.getName(), Font.BOLD, (int)textSize);
+                g.setFont(f);
 
                 Color textColor = textWatermark.getTextColor();
                 g.setColor(new java.awt.Color(textColor.getR(), textColor.getG(), textColor.getB(), textColor.getA())); // 文字颜色
@@ -146,7 +148,9 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
             } else if (watermark instanceof ImageWatermark) {
                 ImageWatermark imageWatermark = (ImageWatermark) watermark;
                 BufferedImage mask = ImageIO.read(imageWatermark.getFile());
-                float iw = mask.getWidth(), ih = mask.getHeight();
+                // 根据size计算绘制尺寸
+                Rectangle2D bounds = MathUtils.getScaleBounds(mw, mh, mask.getWidth(), mask.getHeight(), size);
+                float iw = (float) bounds.getWidth(), ih = (float) bounds.getHeight();
                 // 对齐
                 if (xAlign == Align.CENTER) {
                     tx = tx - iw / 2;
@@ -171,7 +175,7 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
                 }
                 // 旋转画笔
                 g.rotate(Math.toRadians(imageWatermark.getRotation()), tx + iw / 2, ty + ih / 2);
-                g.drawImage(mask, (int) tx, (int) ty, (int) iw / 5, (int) ih / 5, null);
+                g.drawImage(mask, (int) tx, (int) ty, (int) iw, (int) ih, null);
             }
             g.dispose(); // 释放内存
             ImageIO.write(img, this.format, this.dest); // 写出
@@ -187,5 +191,58 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
     public void setFormat(String format) {
         this.format = format;
     }
+    
+    public static void main(String[] args) throws IOException {
+        BufferedImage image = ImageIO.read(new File("d:/watermark/image/1.jpg"));
+        Graphics2D g = image.createGraphics();
+        
+        Font f = new Font(BASEFONT.getName(), Font.PLAIN, 1);
+//        print(f, g);
+//        
+//        f = new Font(f.getName(), Font.PLAIN, 2);
+//        print(f, g);
+//        
+//        f = new Font(f.getName(), Font.PLAIN, 3);
+//        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 10);
+        print(f, g);
+        
+//        f = new Font(f.getName(), Font.PLAIN, 12);
+//        print(f, g);
+//        
+//        f = new Font(f.getName(), Font.PLAIN, 14);
+//        print(f, g);
+//        
+//        f = new Font(f.getName(), Font.PLAIN, 16);
+//        print(f, g);
+//        
+//        f = new Font(f.getName(), Font.PLAIN, 18);
+//        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 20);
+        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 30);
+        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 40);
+        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 50);
+        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 60);
+        print(f, g);
+        
+        f = new Font(f.getName(), Font.PLAIN, 70);
+        print(f, g);
+    }
+    
+    static void print(Font f, Graphics2D g) {
+        System.out.println(g.getFontMetrics(f).getStringBounds("你好，水印！hello", g));
+    }
+    
+    
 
 }

@@ -1,5 +1,10 @@
 package com.xpzheng.watermark.util;
 
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.geom.Rectangle2D;
+
 /**
  * 通用工具集合
  * 
@@ -33,8 +38,15 @@ public class CommonUtils {
         return String.format("%02x%02x%02x%02x", r % 256, g % 256, b % 256, a % 256);
     }
     
-    public static void main(String[] args) {
-        System.out.println(rgba2Hex(255, 255, 255, 254));
+    /**
+     * 测量文本获得文本的宽高信息
+     * @param g   画笔
+     * @param f   字体
+     * @param text 被测量文本
+     * @return
+     */
+    public static Rectangle2D measureText(Graphics g, Font f, String text) {
+        FontMetrics fontMetrics = g.getFontMetrics(f);
+        return fontMetrics.getStringBounds(text, g);
     }
-
 }

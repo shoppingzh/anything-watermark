@@ -6,6 +6,11 @@ package com.xpzheng.watermark.components;
  *
  */
 public class Color {
+    
+    /**
+     * default color
+     */
+    public static final Color DEFAULT = Color.valueOf(64, 64, 64, 255);
 
     private int r;
     private int g;
@@ -44,6 +49,14 @@ public class Color {
         this.a = a;
     }
 
+    /**
+     * Create color
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     * @return
+     */
     public static Color valueOf(int r, int g, int b, int a) {
         Color color = new Color();
         color.r = r;
@@ -52,5 +65,5 @@ public class Color {
         color.a = a;
         return color;
     }
-
+    
 }

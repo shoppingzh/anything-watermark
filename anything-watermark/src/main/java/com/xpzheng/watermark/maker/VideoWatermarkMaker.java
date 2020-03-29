@@ -1,8 +1,13 @@
 package com.xpzheng.watermark.maker;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import com.xpzheng.watermark.AbstractWatermarkMaker;
+import com.xpzheng.watermark.TextGrowable;
 import com.xpzheng.watermark.WatermarkException;
 import com.xpzheng.watermark.components.Align;
 import com.xpzheng.watermark.components.Color;
@@ -18,8 +23,8 @@ import com.xpzheng.watermark.util.CommonUtils;
  * @author xpzheng
  *
  */
-public class VideoWatermarkMaker extends AbstractWatermarkMaker {
-
+public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextGrowable {
+    
     public VideoWatermarkMaker(File src, File dest) {
         super(src, dest);
     }
@@ -30,15 +35,16 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker {
         if (this.dest.exists()) {
             this.dest.delete();
         }
+        final float size = watermark.getSize();
         // FIXME 路径写死了，需要使用活的路径
         String fontPath = "d:/watermark/song.ttf";
         StringBuilder cmd = new StringBuilder("ffmpeg ");
-        cmd.append(String.format("-i %s -vf \"", this.src.getAbsolutePath())); // 输入视频并添加过滤器
+        cmd.append(String.format("-i %s ", this.src.getAbsolutePath())); // 输入视频并添加过滤器
         if (watermark instanceof TextWatermark) {
             TextWatermark textWatermark = (TextWatermark) watermark;
-            cmd.append("drawtext=");
+            cmd.append("-filter_complex \"drawtext=");
             cmd.append(String.format("fontfile=%s: ", convertPath(fontPath))); // 字体
-            cmd.append(String.format("fontsize=%.1f: ", textWatermark.getTextSize())); // 字号
+            cmd.append(String.format("fontsize=%.1f: ", getBaseFontSize() * (1 + size * getFontSizeGrowFactor()))); // 字号
             Color textColor = textWatermark.getTextColor();
             cmd.append(String.format("fontcolor=%s: ", CommonUtils.rgba2Hex(textColor.getR(), textColor.getG(),
                 textColor.getB(), (int) (textWatermark.getOpacity() * 255)))); // 文字颜色
@@ -71,13 +77,21 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker {
             } else if (yAlign == Align.END) {
                 cmd.append(" - text_h");
             }
-            cmd.append("): ");
+            cmd.append("): \"");
         } else if (watermark instanceof ImageWatermark) {
             ImageWatermark imageWatermark = (ImageWatermark) watermark;
             String filePath = imageWatermark.getFile().getAbsolutePath();
-            // 对文件路径的特殊字符进行转义
-            filePath = convertPath(filePath);
-            cmd.append(String.format("movie=%s [watermark]; [in][watermark] overlay=", filePath)); // 水印图片
+            float ratio = 1;
+            try {
+                BufferedImage image = ImageIO.read(imageWatermark.getFile());
+                ratio = 1f * image.getWidth() / image.getHeight();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("比例：" + ratio);
+            
+            cmd.append(String.format("-i %s -filter_complex \"[1:v][0:v]scale2ref=oh * %f:sqrt(main_w * main_h * %f * %f)[wm][video];[video][wm] overlay=", filePath, ratio, size, ratio)); // 水印图片
+            
             // 设置位置
             float x = imageWatermark.getX(), y = imageWatermark.getY();
             float ax = Math.abs(x), ay = Math.abs(y);
@@ -107,10 +121,10 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker {
             } else if (yAlign == Align.END) {
                 cmd.append(" - overlay_h");
             }
-            cmd.append("): ");
-            cmd.append("[out]");
+            cmd.append("): \"");
         }
-        cmd.append(String.format("\" %s", this.dest.getAbsolutePath()));
+        cmd.append(String.format(" %s", this.dest.getAbsolutePath()));
+        System.out.println(cmd);
         int status = CmdUtils.execute(cmd.toString());
         if (status != 0) {
             throw new WatermarkException(WatermarkException.ERR_INNER_ERROR);
@@ -125,5 +139,21 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker {
      */
     private static String convertPath(String path) {
         return path == null ? null : path.replaceAll("\\\\", "/").replaceAll(":", "\\\\\\\\:");
+    }
+
+    /* (non-Javadoc)
+     * @see com.xpzheng.watermark.TextGrowable#getBaseFontSize()
+     */
+    @Override
+    public float getBaseFontSize() {
+        return 24f;
+    }
+
+    /* (non-Javadoc)
+     * @see com.xpzheng.watermark.TextGrowable#getFontSizeGrowFactor()
+     */
+    @Override
+    public float getFontSizeGrowFactor() {
+        return 4f;
     }
 }

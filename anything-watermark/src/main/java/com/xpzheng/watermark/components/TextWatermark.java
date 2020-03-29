@@ -10,7 +10,7 @@ public class TextWatermark extends Watermark {
 
     private String content;
     private float textSize = 14f;
-    private Color textColor = Color.valueOf(0, 0, 0, 0);
+    private Color textColor = Color.DEFAULT;
 
     public TextWatermark(String content) {
         super();
