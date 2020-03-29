@@ -19,6 +19,7 @@ import com.xpzheng.watermark.components.Align;
 import com.xpzheng.watermark.components.Color;
 import com.xpzheng.watermark.components.Watermark;
 import com.xpzheng.watermark.components.Watermark.Builder;
+import com.xpzheng.watermark.util.WebUtils;
 import com.xpzheng.watermark.web.AjaxResult;
 
 /**
@@ -29,12 +30,14 @@ import com.xpzheng.watermark.web.AjaxResult;
 @RequestMapping("watermark")
 public class WatermarkController {
     
+    public static final String WATERMARK_PATH = "watermark";
+    
     @PostMapping("generate")
-    public AjaxResult generate(String src, int type, int size, float x, float y, float xAlign, float yAlign, float rotation, float opacity,
+    public AjaxResult generate(String src, int type, float size, float x, float y, float xAlign, float yAlign, float rotation, float opacity,
             String text, String textColor, String image, HttpServletRequest req) {
         File uploadPath = new File(req.getServletContext().getRealPath("upload"));
         Builder builder = new Watermark.Builder()
-          .size(size / 500f)
+          .size(size)
           .position(x, y)
           .align(xAlign == 0.5f ? Align.CENTER : (xAlign > 0.5f ? Align.END : Align.START), yAlign == 0.5f ? Align.CENTER : (yAlign > 0.5f ? Align.END : Align.START))
           .opactiy(opacity / 100)
@@ -45,10 +48,7 @@ public class WatermarkController {
         
         String filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(src);
         
-        File path = new File(req.getServletContext().getRealPath("watermark"));
-        if (!path.exists()) {
-            path.mkdirs();
-        }
+        File path = WebUtils.getWebPath(req, WATERMARK_PATH);
         try {
             AnythingWatermark.make(new File(uploadPath, src), new File(path, filename), watermark);
         } catch (WatermarkException e) {

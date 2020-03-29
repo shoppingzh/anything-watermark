@@ -39,7 +39,7 @@
             <Button type="success" ghost @click="handleFastDesign"><Icon type="ios-hammer-outline" /> 打开快捷设置面板</Button>
           </FormItem>
           <FormItem label="水印大小">
-            <Slider v-model="conf.size" :min="1" :max="100"></Slider>
+            <Slider v-model="scaledSize" :min="1" :max="100"></Slider>
           </FormItem>
           <FormItem label="水印位置">
             <Row type="flex">
@@ -148,7 +148,7 @@ export default {
         y: 0,
         xAlign: 0,
         yAlign: 0,
-        size: 5,
+        size: 0.01,
         rotation: 0,
         opacity: 100,
         text: '内部使用，请勿盗版！',
@@ -176,6 +176,14 @@ export default {
         this.conf.y = val / 100
       }
     },
+    scaledSize: {
+      get() {
+        return this.conf.size * 500
+      },
+      set(newVal) {
+        this.conf.size = newVal / 500
+      }
+    },
     imageUrl() {
       const image = this.conf.image
       return image ? `http://localhost/upload/${image}` : null
@@ -190,7 +198,6 @@ export default {
       const box = this.$refs.box
       const watermark = this.$refs.watermark
       const size = conf.size
-      const scale = size / 500
       const x = conf.x, y = conf.y
       const xa = conf.xAlign, ya = conf.yAlign
       
@@ -203,13 +210,13 @@ export default {
           const template = this.$refs.textTemplate
           if (template) {
             const th = template.offsetHeight
-            watermark.style.fontSize = Math.min(mh, mw) * scale * 12 / th + 'px'
+            watermark.style.fontSize = Math.min(mh, mw) * size * 12 / th + 'px'
           }
           
         } else if (type == 2) {
           const ratio = ow / oh
           
-          h = Math.sqrt(mw * mh * scale / ratio)
+          h = Math.sqrt(mw * mh * size / ratio)
           w = h * ratio
           watermark.style.width = w + 'px'
           watermark.style.height = h + 'px'

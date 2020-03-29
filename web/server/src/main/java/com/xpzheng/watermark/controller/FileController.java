@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.xpzheng.watermark.util.WebUtils;
 import com.xpzheng.watermark.web.AjaxResult;
 
 /**
@@ -29,11 +30,7 @@ public class FileController {
 
     @PostMapping("upload")
     public AjaxResult upload(MultipartFile file, HttpServletRequest req) throws IllegalStateException, IOException {
-        String uploadPath = req.getServletContext().getRealPath(UPLOAD_FILE_PATH);
-        File path = new File(uploadPath);
-        if (!path.exists()) {
-            path.mkdirs();
-        }
+        File path = WebUtils.getWebPath(req, UPLOAD_FILE_PATH);
         String filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
         file.transferTo(new File(path, filename));
         return AjaxResult.success(filename);
