@@ -17,6 +17,7 @@ public class WatermarkException extends RuntimeException {
     public static final int ERR_READ_WRITE_ERROR = 4; // 读写错误
     public static final int ERR_INNER_ERROR = 5; // 内部错误(如pdf的DocumentException，cmd命令执行错误，图片解析错误，jacob桥接错误等等)
     public static final int ERR_WATERMARK_INVALID = 6; // 水印不合法
+    public static final int ERR_MISS_CONFIG = 7; // 缺少配置文件
 
     private int errorCode;
 
@@ -49,6 +50,9 @@ public class WatermarkException extends RuntimeException {
             break;
         case ERR_WATERMARK_INVALID:
             sb.append("非法水印");
+            break;
+        case ERR_MISS_CONFIG:
+            sb.append("缺少配置文件");
             break;
         default:
             break;

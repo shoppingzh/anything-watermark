@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.xpzheng.watermark.AbstractWatermarkMaker;
+import com.xpzheng.watermark.Config;
 import com.xpzheng.watermark.TextGrowable;
 import com.xpzheng.watermark.WatermarkException;
 import com.xpzheng.watermark.components.Align;
@@ -28,17 +29,20 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
     public VideoWatermarkMaker(File src, File dest) {
         super(src, dest);
     }
-
+    
     @Override
     public void make(Watermark watermark) throws WatermarkException {
         super.make(watermark);
         if (this.dest.exists()) {
             this.dest.delete();
         }
+        String ffmpegHome = Config.getInstance().getFfmpegHome();
+        if (ffmpegHome == null) {
+            throw new WatermarkException(WatermarkException.ERR_MISS_CONFIG);
+        }
         final float size = watermark.getSize();
-        // FIXME 路径写死了，需要使用活的路径
-        String fontPath = "d:/watermark/song.ttf";
-        StringBuilder cmd = new StringBuilder("ffmpeg ");
+        String fontPath = Config.getInstance().getFont();
+        StringBuilder cmd = new StringBuilder(ffmpegHome).append(" ");
         cmd.append(String.format("-i %s ", this.src.getAbsolutePath())); // 输入视频并添加过滤器
         if (watermark instanceof TextWatermark) {
             TextWatermark textWatermark = (TextWatermark) watermark;
@@ -88,8 +92,6 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("比例：" + ratio);
-            
             cmd.append(String.format("-i %s -filter_complex \"[1:v][0:v]scale2ref=oh * %f:sqrt(main_w * main_h * %f * %f)[wm][video];[video][wm] overlay=", filePath, ratio, size, ratio)); // 水印图片
             
             // 设置位置

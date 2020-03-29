@@ -298,9 +298,10 @@ export default {
       conf.y = 0.5
       conf.xAlign = 0.5
       conf.yAlign = 0.5
-      conf.textColor = '#ccc'
+      conf.textColor = '#666'
       conf.rotation = 30
-      conf.opacity = 30
+      conf.opacity = 70
+      conf.size = 0.05
     },
     handleFastPdf2() {
       this.fast = false
@@ -310,8 +311,9 @@ export default {
       conf.xAlign = 1
       conf.yAlign = 1
       conf.rotation = 0
-      conf.opacity = 50
-      conf.textColor = '#ccc'
+      conf.opacity = 70
+      conf.textColor = '#666'
+      conf.size = 0.05
     },
     handleFastVideo1() {
       this.fast = false
@@ -331,9 +333,9 @@ export default {
       conf.y = 1
       conf.xAlign = 0.5
       conf.yAlign = 1
-      conf.textColor = '#999'
+      conf.textColor = '#fff'
       conf.rotation = 0
-      conf.opacity = 80
+      conf.opacity = 95
     },
     handleFastImage2() {
       this.fast = false
