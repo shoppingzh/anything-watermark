@@ -54,7 +54,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             float ax = Math.abs(x), ay = Math.abs(y);
             Align xAlign = textWatermark.getxAlign(), yAlign = textWatermark.getyAlign();
             cmd.append("x=(");
-            if (ax > 0 && ax < 1) {
+            if (ax > 0 && ax <= 1) {
                 cmd.append(String.format(x > 0 ? "(main_w * %f)" : "(main_w - main_w * %f)", ax));
             } else {
                 cmd.append(String.format(x >= 0 ? "%f" : "(main_w + %f)", x));
@@ -67,7 +67,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append("): ");
 
             cmd.append("y=(");
-            if (ay > 0 && ay < 1) {
+            if (ay > 0 && ay <= 1) {
                 cmd.append(String.format(y > 0 ? "(main_h * %f)" : "(main_h - main_h * %f)", ay));
             } else {
                 cmd.append(String.format(y >= 0 ? "%f" : "(main_h + %f)", y));
@@ -97,7 +97,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             float ax = Math.abs(x), ay = Math.abs(y);
             Align xAlign = imageWatermark.getxAlign(), yAlign = imageWatermark.getyAlign();
             cmd.append("x=(");
-            if (ax > 0 && ax < 1) {
+            if (ax > 0 && ax <= 1) {
                 cmd.append(String.format(x > 0 ? "(main_w * %f)" : "(main_w - main_w * %f)", ax));
             } else {
                 cmd.append(String.format(x >= 0 ? "%f" : "(main_w + %f)", x));
@@ -111,7 +111,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append("): ");
 
             cmd.append("y=(");
-            if (ay > 0 && ay < 1) {
+            if (ay > 0 && ay <= 1) {
                 cmd.append(String.format(y > 0 ? "(main_h * %f)" : "(main_h - main_h * %f)", ay));
             } else {
                 cmd.append(String.format(y >= 0 ? "%f" : "(main_h + %f)", y));
