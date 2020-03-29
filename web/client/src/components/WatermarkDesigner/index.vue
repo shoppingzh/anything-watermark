@@ -26,7 +26,7 @@
           </FormItem>
           <FormItem v-show="conf.type == 1">
             <template #label><Icon type="ios-document-outline" /> 文字颜色</template>
-            <ColorPicker v-model="conf.textColor" alpha :colors="['#333', '#666', '#999', '#aaa', '#bbb', '#ccc', '#ddd']"/>
+            <ColorPicker v-model="conf.textColor" format="hex" :colors="['#333', '#666', '#999', '#aaa', '#bbb', '#ccc', '#ddd', '#eee', '#fff']"/>
           </FormItem>
           <FormItem v-show="conf.type == 2">
             <template #label><Icon type="md-image" /> 水印图片</template>

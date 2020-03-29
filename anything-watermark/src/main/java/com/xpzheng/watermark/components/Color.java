@@ -1,12 +1,14 @@
 package com.xpzheng.watermark.components;
 
+import java.math.BigInteger;
+
 /**
  * 颜色
  * @author xpzheng
  *
  */
 public class Color {
-    
+
     /**
      * default color
      */
@@ -15,7 +17,7 @@ public class Color {
     private int r;
     private int g;
     private int b;
-    private int a;
+    private int a = 0xff;
 
     public int getR() {
         return r;
@@ -50,7 +52,7 @@ public class Color {
     }
 
     /**
-     * Create color
+     * 通过rgba分量创建Color
      * @param r
      * @param g
      * @param b
@@ -65,5 +67,46 @@ public class Color {
         color.a = a;
         return color;
     }
-    
+
+    /**
+     * 将16进制的颜色值转为Color(不包含alpha)
+     * @param hex
+     * @return
+     */
+    public static Color valueOf(String hex) {
+        if (hex == null) {
+            throw new IllegalArgumentException("颜色值为空！");
+        }
+        hex = hex.trim();
+        if (hex.startsWith("#")) {
+            hex = hex.substring(1);
+        }
+        if (hex.length() != 3 && hex.length() != 6) {
+            throw new IllegalArgumentException("非法颜色值！");
+        }
+        if (hex.length() == 3) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0, len = hex.length(); i < len; i++) {
+                char c = hex.charAt(i);
+                sb.append(c).append(c);
+            }
+            hex = sb.toString();
+        }
+        int r = 0, g = 0, b = 0;
+        for (int i = 0, len = hex.length(); i < len; i += 2) {
+            if (i + 1 >= len) {
+                break;
+            }
+            String h = "" + hex.charAt(i) + hex.charAt(i + 1);
+            int c = new BigInteger(h, 16).intValue();
+            if (i == 0) {
+                r = c;
+            } else if (i == 2) {
+                g = c;
+            } else if (i == 4) {
+                b = c;
+            }
+        }
+        return valueOf(r, g, b, 0xff);
+    }
 }

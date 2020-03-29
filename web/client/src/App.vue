@@ -17,7 +17,7 @@
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
               <p>选择一个文件或将文件拖动至此</p>
               <p>
-                <Tag type="border" color="primary">PDF</Tag> <Tag type="border" color="warning">视频</Tag> <Tag type="border" color="success">图片</Tag>
+                <Tag type="border" color="primary">PDF</Tag> <Tag type="border" color="warning">视频</Tag> <Tag type="border" color="success">图片</Tag> <Tag type="border" color="purple">Word</Tag>
               </p>
             </div>
         </Upload>

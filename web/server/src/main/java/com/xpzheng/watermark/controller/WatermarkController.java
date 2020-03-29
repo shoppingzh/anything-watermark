@@ -42,8 +42,9 @@ public class WatermarkController {
           .align(xAlign == 0.5f ? Align.CENTER : (xAlign > 0.5f ? Align.END : Align.START), yAlign == 0.5f ? Align.CENTER : (yAlign > 0.5f ? Align.END : Align.START))
           .opactiy(opacity / 100)
           .rotate(rotation);
+        
         Watermark watermark = type == 1 
-            ? builder.createText(text, Color.valueOf(64, 64, 64, 255))
+            ? builder.createText(text, Color.valueOf(textColor))
             : builder.createImage(uploadPath.getAbsolutePath() + "/" + image);
         
         String filename = UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(src);
