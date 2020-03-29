@@ -261,7 +261,7 @@ export default {
       conf.x = 0
       conf.y = 0
       conf.xAlign = 0
-      conf.yAlign = 1
+      conf.yAlign = 0
     },
     handlePosRightTop() {
       const conf = this.conf
