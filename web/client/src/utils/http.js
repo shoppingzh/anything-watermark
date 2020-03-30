@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const service = axios.create({
-  baseURL: 'http://localhost',
+  baseURL: process.env.NODE_ENV == 'development' ? 'http://localhost' : '',
   timeout: 6000000
 })
 

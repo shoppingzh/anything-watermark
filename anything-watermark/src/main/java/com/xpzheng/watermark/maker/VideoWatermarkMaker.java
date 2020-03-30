@@ -6,6 +6,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xpzheng.watermark.AbstractWatermarkMaker;
 import com.xpzheng.watermark.Config;
 import com.xpzheng.watermark.TextGrowable;
@@ -25,6 +28,8 @@ import com.xpzheng.watermark.util.CommonUtils;
  *
  */
 public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextGrowable {
+    
+    private static Logger LOG = LoggerFactory.getLogger(VideoWatermarkMaker.class); 
     
     public VideoWatermarkMaker(File src, File dest) {
         super(src, dest);
@@ -126,7 +131,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append("): \"");
         }
         cmd.append(String.format(" %s", this.dest.getAbsolutePath()));
-        System.out.println(cmd);
+        LOG.debug("视频水印命令执行: {}", cmd.toString());
         int status = CmdUtils.execute(cmd.toString());
         if (status != 0) {
             throw new WatermarkException(WatermarkException.ERR_INNER_ERROR);

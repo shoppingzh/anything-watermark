@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 
 /**
  * 命令行执行工具集合
@@ -24,29 +23,10 @@ public class CmdUtils {
         Process exec = null;
         try {
             exec = Runtime.getRuntime().exec(cmd);
-            final Process exec2 = exec;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        print(exec2.getErrorStream(), true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        print(exec2.getInputStream(), false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-
+            // 消耗error输入流的数据
+            new Thread(new InputStreamCustomer(exec.getErrorStream())).start();
+            // 消耗return输入流的数据
+            new Thread(new InputStreamCustomer(exec.getInputStream())).start();
             return exec.waitFor();
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,15 +41,30 @@ public class CmdUtils {
         return -1;
     }
 
-    private static final void print(InputStream in, boolean error) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, "gbk"));
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            @SuppressWarnings("resource")
-            PrintStream ps = error ? System.err : System.out;
-            ps.println(line);
+    /**
+     * 输入流消费者
+     * 
+     * @author xpzheng
+     *
+     */
+    private static class InputStreamCustomer implements Runnable {
+
+        private InputStream in;
+
+        public InputStreamCustomer(InputStream in) {
+            super();
+            this.in = in;
         }
-        br.close();
+
+        @Override
+        public void run() {
+            try (InputStreamReader ir = new InputStreamReader(in); BufferedReader br = new BufferedReader(ir)) {
+                while (br.readLine() != null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

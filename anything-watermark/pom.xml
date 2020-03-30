@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.xpzheng</groupId>
   <artifactId>anything-watermark</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
 
   <properties>
     <poi.version>3.16</poi.version>
@@ -44,6 +44,12 @@
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-scratchpad</artifactId>
       <version>${poi.version}</version>
+    </dependency>
+    <!-- log facade -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.6</version>
     </dependency>
   </dependencies>
 

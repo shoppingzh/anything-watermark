@@ -30,7 +30,7 @@
           </FormItem>
           <FormItem v-show="conf.type == 2">
             <template #label><Icon type="md-image" /> 水印图片</template>
-            <Upload action="http://localhost/file/upload" :on-success="handleImageUploaded">
+            <Upload action="/file/upload" :on-success="handleImageUploaded">
                 <Button icon="ios-cloud-upload-outline">选择文件</Button>
             </Upload>
           </FormItem>
@@ -186,7 +186,7 @@ export default {
     },
     imageUrl() {
       const image = this.conf.image
-      return image ? `http://localhost/upload/${image}` : null
+      return image ? `/upload/${image}` : null
     },
     styles: function() {
       

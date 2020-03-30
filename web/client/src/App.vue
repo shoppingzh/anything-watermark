@@ -11,8 +11,9 @@
         <Upload
           v-if="step === 0"
           type="drag"
-          action="http://localhost/file/upload"
-          :on-success="handleUploaded">
+          action="/file/upload"
+          :on-success="handleUploaded"
+          :on-error="handleUploadError">
             <div style="padding: 60px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
               <p>选择一个文件或将文件拖动至此</p>
@@ -36,8 +37,8 @@
           <div v-else-if="resultType == 'pdf'" style="height: 100%; overflow: auto;">
             <pdf :src="resultSrc"></pdf>
           </div>
-          <a v-else :href="'http://localhost/watermark/' + result" target="_blank">
-            http://localhost/watermark/{{result}}
+          <a v-else :href="'/watermark/' + result" target="_blank">
+            {{result}}
           </a>
           <Row v-show="moreAction" type="flex" class="result-box__overlay">
             <i-col :span="12" class="result-box__overlay__item" style="background-color: rgba(255, 153, 0, .75)" @click.native="handleDownload">
@@ -102,7 +103,7 @@ export default {
       return 'image'
     },
     resultSrc() {
-      return `http://localhost/watermark/${this.result}`
+      return `/watermark/${this.result}`
     }
   },
   methods: {
@@ -111,6 +112,9 @@ export default {
       if (resp.success) {
         this.src = resp.data
       }
+    },
+    handleUploadError() {
+      this.$Message.error('上传失败，请检查网络设置')
     },
     handleDesignEnd() {
       this.designing = true
