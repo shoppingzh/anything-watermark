@@ -14,10 +14,15 @@ import com.xpzheng.watermark.components.Watermark;
  */
 public abstract class AbstractWatermarkMaker implements WatermarkMaker {
 
-    protected final File src;
-    protected final File dest;
+    protected File src;
+    protected File dest;
     protected float edgeOffset = 15;
-    
+
+    // 不对外开放无参构造函数
+    protected AbstractWatermarkMaker() {
+        super();
+    }
+
     public AbstractWatermarkMaker(File src, File dest) {
         super();
         this.src = src;
@@ -44,8 +49,7 @@ public abstract class AbstractWatermarkMaker implements WatermarkMaker {
     public final void make(Watermark watermark) throws WatermarkException {
         check();
         checkWatermarkValid(watermark);
-        boolean next = beforeMake(watermark);
-        if (!next) {
+        if (!beforeMake(watermark)) {
             return;
         }
         if (watermark instanceof TextWatermark) {
@@ -60,8 +64,9 @@ public abstract class AbstractWatermarkMaker implements WatermarkMaker {
 
     /**
      * 创建水印前(准备工作)
+     * 
      * @param watermark
-     * @return 
+     * @return
      */
     protected boolean beforeMake(Watermark watermark) {
         return true;
@@ -80,9 +85,10 @@ public abstract class AbstractWatermarkMaker implements WatermarkMaker {
      * @param watermark
      */
     protected abstract void makeForImage(ImageWatermark watermark);
-    
+
     /**
      * 创建水印后(清理工作)
+     * 
      * @param watermark
      */
     protected void afterMake(Watermark watermark) {

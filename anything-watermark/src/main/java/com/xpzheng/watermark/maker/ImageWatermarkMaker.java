@@ -68,12 +68,12 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         try {
             this.srcImage = ImageIO.read(src);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new WatermarkException(WatermarkException.ERR_READ_WRITE_ERROR);
         }
     }
 
     public ImageWatermarkMaker(File src, File dest, String format) {
-        super(src, dest);
+        this(src, dest);
         this.format = format;
     }
 

@@ -8,7 +8,7 @@
 //
 //public class VideoWatermarkMakerTest {
 //
-//    private static final File SRC = new File("d:/watermark/1.mp4");
+//    private static final File SRC = new File("d:/watermark/video/1.mp4");
 //
 //    @Test
 //    public void testPositionLeftTop() {
@@ -46,6 +46,12 @@
 //        Watermark watermark2 = new Watermark.Builder().center().opactiy(0.75f).createImage("d:/watermark/logo.png");
 //        new VideoWatermarkMaker(SRC, new File("d:/watermark/1-opacity-text.mp4")).make(watermark);
 //        new VideoWatermarkMaker(SRC, new File("d:/watermark/1-opacity-image.mp4")).make(watermark2);
+//    }
+//    
+//    @Test
+//    public void testH264() {
+//        Watermark watermark = new Watermark.Builder().center().opactiy(0.5f).createText("你好，水印！");
+//        new VideoWatermarkMaker(SRC, new File("d:/watermark/1-h264.mp4")).make(watermark);
 //    }
 //
 //}

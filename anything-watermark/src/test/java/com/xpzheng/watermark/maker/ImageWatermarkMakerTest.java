@@ -1,20 +1,20 @@
-//package com.xpzheng.watermark.maker;
-//
-//import java.io.File;
-//
-//import org.apache.commons.io.FilenameUtils;
-//import org.junit.jupiter.api.Test;
-//
-//import com.xpzheng.watermark.components.Align;
-//import com.xpzheng.watermark.components.Color;
-//import com.xpzheng.watermark.components.TextWatermark;
-//import com.xpzheng.watermark.components.Watermark;
-//
-//public class ImageWatermarkMakerTest {
-//    
-//    private static final String BASE_PATH = "d:/watermark/image/";
-//    private static final File SRC = new File(BASE_PATH + "1.jpg");
-//    
+package com.xpzheng.watermark.maker;
+
+import java.io.File;
+
+import org.apache.commons.io.FilenameUtils;
+import org.junit.jupiter.api.Test;
+
+import com.xpzheng.watermark.components.Align;
+import com.xpzheng.watermark.components.Color;
+import com.xpzheng.watermark.components.TextWatermark;
+import com.xpzheng.watermark.components.Watermark;
+
+public class ImageWatermarkMakerTest {
+    
+    private static final String BASE_PATH = "d:/watermark/image/";
+    private static final File SRC = new File(BASE_PATH + "1.jpg");
+    
 //    @Test
 //    public void testFullDemo() {
 //        Watermark watermark = new Watermark.Builder()
@@ -129,7 +129,7 @@
 //        new ImageWatermarkMaker(SRC, new File(BASE_PATH + "1-fontSize-200.jpg")).make(watermark);
 //    }
 //    
-//    public void testDifferentSize() {
+//    public void testDifferentSizeImage() {
 //        Watermark watermark = new Watermark.Builder()
 ////            .position(0.5f, 0.5f)
 ////            .align(Align.CENTER, Align.CENTER)
@@ -154,5 +154,12 @@
 //            }
 //        }
 //    }
-//    
-//}
+    
+    @Test
+    public void testDiffrentSizeWatermark() {
+        Watermark watermark = new Watermark.Builder()
+            .center()
+            .createText("你好，水印！");
+    }
+    
+}

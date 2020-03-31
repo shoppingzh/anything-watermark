@@ -80,13 +80,5 @@ public class WordWatermarkMaker extends AbstractWatermarkMaker {
     protected void makeForImage(ImageWatermark watermark) {
         throw new WatermarkException(WatermarkException.ERR_UNSUPPORTED);
     }
-    
-    public static void main(String[] args) {
-        Watermark watermark = new Watermark.Builder()
-            .center()
-            .rotate(45)
-            .createText("hello, world");
-        new WordWatermarkMaker(new File("d:/watermark/word/1.docx"), new File("d:/output.docx")).make(watermark);
-    }
 
 }
