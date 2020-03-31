@@ -14,14 +14,10 @@ import com.xpzheng.watermark.components.Watermark;
  */
 public abstract class AbstractWatermarkMaker implements WatermarkMaker {
 
-    protected File src;
-    protected File dest;
+    protected final File src;
+    protected final File dest;
     protected float edgeOffset = 15;
-
-    public AbstractWatermarkMaker() {
-        super();
-    }
-
+    
     public AbstractWatermarkMaker(File src, File dest) {
         super();
         this.src = src;
@@ -32,16 +28,8 @@ public abstract class AbstractWatermarkMaker implements WatermarkMaker {
         return src;
     }
 
-    public void setSrc(File src) {
-        this.src = src;
-    }
-
     public File getDest() {
         return dest;
-    }
-
-    public void setDest(File dest) {
-        this.dest = dest;
     }
 
     public float getEdgeOffset() {
@@ -53,15 +41,58 @@ public abstract class AbstractWatermarkMaker implements WatermarkMaker {
     }
 
     @Override
-    public void make(Watermark watermark) throws WatermarkException {
+    public final void make(Watermark watermark) throws WatermarkException {
         check();
         checkWatermarkValid(watermark);
+        boolean next = beforeMake(watermark);
+        if (!next) {
+            return;
+        }
+        if (watermark instanceof TextWatermark) {
+            makeForText((TextWatermark) watermark);
+        } else if (watermark instanceof ImageWatermark) {
+            makeForImage((ImageWatermark) watermark);
+        } else {
+            throw new WatermarkException(WatermarkException.ERR_UNSUPPORTED);
+        }
+        afterMake(watermark);
+    }
+
+    /**
+     * 创建水印前(准备工作)
+     * @param watermark
+     * @return 
+     */
+    protected boolean beforeMake(Watermark watermark) {
+        return true;
+    }
+
+    /**
+     * 创建文字水印
+     * 
+     * @param watermark
+     */
+    protected abstract void makeForText(TextWatermark watermark);
+
+    /**
+     * 创建图片水印
+     * 
+     * @param watermark
+     */
+    protected abstract void makeForImage(ImageWatermark watermark);
+    
+    /**
+     * 创建水印后(清理工作)
+     * @param watermark
+     */
+    protected void afterMake(Watermark watermark) {
+        // NOP
     }
 
     /**
      * 检查参数
      */
-    protected void check() {
+    private void check() {
         if (src == null || !src.exists()) {
             throw new WatermarkException(WatermarkException.ERR_SOURCE_NOT_FOUND);
         }

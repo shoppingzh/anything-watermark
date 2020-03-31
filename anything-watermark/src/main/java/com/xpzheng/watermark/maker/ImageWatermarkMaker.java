@@ -18,7 +18,6 @@ import com.xpzheng.watermark.components.Align;
 import com.xpzheng.watermark.components.Color;
 import com.xpzheng.watermark.components.ImageWatermark;
 import com.xpzheng.watermark.components.TextWatermark;
-import com.xpzheng.watermark.components.Watermark;
 import com.xpzheng.watermark.util.MathUtils;
 
 /**
@@ -62,13 +61,15 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
     }
 
     private String format = FORMAT_JPG;
-
-    public ImageWatermarkMaker() {
-        super();
-    }
+    private BufferedImage srcImage;
 
     public ImageWatermarkMaker(File src, File dest) {
         super(src, dest);
+        try {
+            this.srcImage = ImageIO.read(src);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public ImageWatermarkMaker(File src, File dest, String format) {
@@ -77,110 +78,126 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
     }
 
     @Override
-    public void make(Watermark watermark) throws WatermarkException {
-        super.make(watermark);
+    protected void makeForText(TextWatermark watermark) {
+        Graphics2D g = srcImage.createGraphics();
+        float mw = srcImage.getWidth(), mh = srcImage.getHeight(); // 图片宽高
+        float x = watermark.getX(), y = watermark.getY();
+        Align xAlign = watermark.getxAlign(), yAlign = watermark.getyAlign();
+        float tx = MathUtils.transCoord(x, mw), ty = MathUtils.transCoord(y, mh);
+        float size = watermark.getSize();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, watermark.getOpacity())); // 透明度(使用组合像素的方式)
+        final String text = watermark.getContent();
+        float textSize = 12f;
+        Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) textSize); // 字体样式、大小
+        g.setFont(f);
+        // 计算该字体绘制出的水印高度，如果不足最小高度(或大于最大高度)，则自动伸缩到最佳高度
+        if (size < MIN_TEXT_PERCENT) {
+            size = MIN_TEXT_PERCENT;
+        }
+        if (size > MAX_TEXT_PERCENT) {
+            size = MAX_TEXT_PERCENT;
+        }
+        final float textHeight = Math.min(mw, mh) * size;
+        Rectangle2D originalBounds = g.getFontMetrics(f).getStringBounds(text, g);
+        textSize = (float) (textSize * textHeight / originalBounds.getHeight());
+        f = new Font(f.getName(), Font.BOLD, (int) textSize);
+        g.setFont(f);
 
+        Color textColor = watermark.getTextColor();
+        g.setColor(new java.awt.Color(textColor.getR(), textColor.getG(), textColor.getB(), textColor.getA())); // 文字颜色
+        // 计算文本的绘制坐标
+        // 1. 换算比例坐标、反向坐标为真实坐标
+        // 2. 根据对齐方式计算对齐后的新坐标
+        // 3. 边缘处理，所有超出的部分贴边并留出一部分空白
+        // 4. 绘制时，要考虑基线的影响，需将y轴坐标抬起基线到文字底部的高度
+        FontMetrics fontMetrics = g.getFontMetrics(f);
+        Rectangle2D bounds = fontMetrics.getStringBounds(text, g);
+        float tw = (float) bounds.getWidth(), th = (float) bounds.getHeight();
+        float offsetY = (float) (th + bounds.getY()); // 字符绘制基线距离字符底部的偏移量
+        // 对齐
+        if (xAlign == Align.CENTER) {
+            tx = tx - tw / 2;
+        } else if (xAlign == Align.END) {
+            tx = tx - tw;
+        }
+
+        if (yAlign == Align.CENTER) {
+            ty = ty - th / 2;
+        }
+        // 边缘处理
+        if (tx <= 0) {
+            tx = EDGE_OFFSET;
+        } else if (tx + tw >= mw) {
+            tx = mw - tw - EDGE_OFFSET;
+        }
+        if (ty <= 0) {
+            ty = th + EDGE_OFFSET;
+        } else if (ty >= mh) {
+            ty = mh - EDGE_OFFSET;
+        }
+        // 旋转画笔
+        g.rotate(Math.toRadians(watermark.getRotation()), tx + tw / 2, ty - th / 2);
+        g.drawString(text, tx, ty - offsetY);
+        g.dispose(); // 释放内存
+        writeToDest(); // 写出
+    }
+
+    @Override
+    protected void makeForImage(ImageWatermark watermark) {
+        Graphics2D g = srcImage.createGraphics();
+        float mw = srcImage.getWidth(), mh = srcImage.getHeight(); // 图片宽高
+        float x = watermark.getX(), y = watermark.getY();
+        Align xAlign = watermark.getxAlign(), yAlign = watermark.getyAlign();
+        float tx = MathUtils.transCoord(x, mw), ty = MathUtils.transCoord(y, mh);
+        float size = watermark.getSize();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, watermark.getOpacity())); // 透明度(使用组合像素的方式)
         try {
-            BufferedImage img = ImageIO.read(this.src);
-            Graphics2D g = img.createGraphics();
-
-            float mw = img.getWidth(), mh = img.getHeight(); // 图片宽高
-            float x = watermark.getX(), y = watermark.getY();
-            Align xAlign = watermark.getxAlign(), yAlign = watermark.getyAlign();
-            float tx = MathUtils.transCoord(x, mw), ty = MathUtils.transCoord(y, mh);
-            float size = watermark.getSize();
-
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, watermark.getOpacity())); // 透明度(使用组合像素的方式)
-            if (watermark instanceof TextWatermark) {
-                TextWatermark textWatermark = (TextWatermark) watermark;
-                final String text = textWatermark.getContent();
-                float textSize = textWatermark.getTextSize();
-                Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) 12); // 字体样式、大小
-                g.setFont(f);
-                // 计算该字体绘制出的水印高度，如果不足最小高度(或大于最大高度)，则自动伸缩到最佳高度
-                if (size  < MIN_TEXT_PERCENT) {
-                    size = MIN_TEXT_PERCENT;
-                }
-                if (size  > MAX_TEXT_PERCENT) {
-                    size = MAX_TEXT_PERCENT;
-                }
-                final float textHeight = Math.min(mw, mh) * size;
-                Rectangle2D originalBounds = g.getFontMetrics(f).getStringBounds(text, g);
-                textSize = (float) (textSize * textHeight / originalBounds.getHeight());
-                f = new Font(f.getName(), Font.BOLD, (int)textSize);
-                g.setFont(f);
-
-                Color textColor = textWatermark.getTextColor();
-                g.setColor(new java.awt.Color(textColor.getR(), textColor.getG(), textColor.getB(), textColor.getA())); // 文字颜色
-                // 计算文本的绘制坐标
-                // 1. 换算比例坐标、反向坐标为真实坐标
-                // 2. 根据对齐方式计算对齐后的新坐标
-                // 3. 边缘处理，所有超出的部分贴边并留出一部分空白
-                // 4. 绘制时，要考虑基线的影响，需将y轴坐标抬起基线到文字底部的高度
-                FontMetrics fontMetrics = g.getFontMetrics(f);
-                Rectangle2D bounds = fontMetrics.getStringBounds(text, g);
-                float tw = (float) bounds.getWidth(), th = (float) bounds.getHeight();
-                float offsetY = (float) (th + bounds.getY()); // 字符绘制基线距离字符底部的偏移量
-                // 对齐
-                if (xAlign == Align.CENTER) {
-                    tx = tx - tw / 2;
-                } else if (xAlign == Align.END) {
-                    tx = tx - tw;
-                }
-
-                if (yAlign == Align.CENTER) {
-                    ty = ty - th / 2;
-                }
-                // 边缘处理
-                if (tx <= 0) {
-                    tx = EDGE_OFFSET;
-                } else if (tx + tw >= mw) {
-                    tx = mw - tw - EDGE_OFFSET;
-                }
-                if (ty <= 0) {
-                    ty = th + EDGE_OFFSET;
-                } else if (ty >= mh) {
-                    ty = mh - EDGE_OFFSET;
-                }
-                // 旋转画笔
-                g.rotate(Math.toRadians(textWatermark.getRotation()), tx + tw / 2, ty - th / 2);
-                g.drawString(text, tx, ty - offsetY);
-            } else if (watermark instanceof ImageWatermark) {
-                ImageWatermark imageWatermark = (ImageWatermark) watermark;
-                BufferedImage mask = ImageIO.read(imageWatermark.getFile());
-                // 根据size计算绘制尺寸
-                Rectangle2D bounds = MathUtils.getScaleBounds(mw, mh, mask.getWidth(), mask.getHeight(), size);
-                float iw = (float) bounds.getWidth(), ih = (float) bounds.getHeight();
-                // 对齐
-                if (xAlign == Align.CENTER) {
-                    tx = tx - iw / 2;
-                } else if (xAlign == Align.END) {
-                    tx = tx - iw;
-                }
-                if (yAlign == Align.CENTER) {
-                    ty = ty - ih / 2;
-                } else if (yAlign == Align.END) {
-                    ty = ty - ih;
-                }
-                // 边缘处理
-                if (tx <= 0) {
-                    tx = EDGE_OFFSET;
-                } else if (tx + iw >= mw) {
-                    tx = mw - iw - EDGE_OFFSET;
-                }
-                if (ty <= 0) {
-                    ty = EDGE_OFFSET;
-                } else if (ty + ih >= mh) {
-                    ty = mh - ih - EDGE_OFFSET;
-                }
-                // 旋转画笔
-                g.rotate(Math.toRadians(imageWatermark.getRotation()), tx + iw / 2, ty + ih / 2);
-                g.drawImage(mask, (int) tx, (int) ty, (int) iw, (int) ih, null);
+            BufferedImage mask = ImageIO.read(watermark.getFile());
+            // 根据size计算绘制尺寸
+            Rectangle2D bounds = MathUtils.getScaleBounds(mw, mh, mask.getWidth(), mask.getHeight(), size);
+            float iw = (float) bounds.getWidth(), ih = (float) bounds.getHeight();
+            // 对齐
+            if (xAlign == Align.CENTER) {
+                tx = tx - iw / 2;
+            } else if (xAlign == Align.END) {
+                tx = tx - iw;
             }
-            g.dispose(); // 释放内存
-            ImageIO.write(img, this.format, this.dest); // 写出
+            if (yAlign == Align.CENTER) {
+                ty = ty - ih / 2;
+            } else if (yAlign == Align.END) {
+                ty = ty - ih;
+            }
+            // 边缘处理
+            if (tx <= 0) {
+                tx = EDGE_OFFSET;
+            } else if (tx + iw >= mw) {
+                tx = mw - iw - EDGE_OFFSET;
+            }
+            if (ty <= 0) {
+                ty = EDGE_OFFSET;
+            } else if (ty + ih >= mh) {
+                ty = mh - ih - EDGE_OFFSET;
+            }
+            // 旋转画笔
+            g.rotate(Math.toRadians(watermark.getRotation()), tx + iw / 2, ty + ih / 2);
+            g.drawImage(mask, (int) tx, (int) ty, (int) iw, (int) ih, null);
         } catch (IOException e) {
             throw new WatermarkException(WatermarkException.ERR_READ_WRITE_ERROR);
+        }
+        g.dispose(); // 释放内存
+        writeToDest(); // 写出
+    }
+
+    /**
+     * 写出原始图片到目标文件中
+     * 
+     * @throws WatermarkException
+     */
+    private void writeToDest() throws WatermarkException {
+        try {
+            ImageIO.write(this.srcImage, this.format, this.dest);
+        } catch (IOException e) {
+            throw new WatermarkException(WatermarkException.ERR_INNER_ERROR);
         }
     }
 
@@ -191,58 +208,4 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
     public void setFormat(String format) {
         this.format = format;
     }
-    
-    public static void main(String[] args) throws IOException {
-        BufferedImage image = ImageIO.read(new File("d:/watermark/image/1.jpg"));
-        Graphics2D g = image.createGraphics();
-        
-        Font f = new Font(BASEFONT.getName(), Font.PLAIN, 1);
-//        print(f, g);
-//        
-//        f = new Font(f.getName(), Font.PLAIN, 2);
-//        print(f, g);
-//        
-//        f = new Font(f.getName(), Font.PLAIN, 3);
-//        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 10);
-        print(f, g);
-        
-//        f = new Font(f.getName(), Font.PLAIN, 12);
-//        print(f, g);
-//        
-//        f = new Font(f.getName(), Font.PLAIN, 14);
-//        print(f, g);
-//        
-//        f = new Font(f.getName(), Font.PLAIN, 16);
-//        print(f, g);
-//        
-//        f = new Font(f.getName(), Font.PLAIN, 18);
-//        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 20);
-        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 30);
-        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 40);
-        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 50);
-        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 60);
-        print(f, g);
-        
-        f = new Font(f.getName(), Font.PLAIN, 70);
-        print(f, g);
-    }
-    
-    static void print(Font f, Graphics2D g) {
-        System.out.println(g.getFontMetrics(f).getStringBounds("你好，水印！hello", g));
-    }
-    
-    
-
 }

@@ -55,7 +55,11 @@ public class AnythingWatermark {
             throw new WatermarkException(WatermarkException.ERR_UNSUPPORTED);
         }
 
-        maker.make(watermark);
+        try {
+            maker.make(watermark);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
