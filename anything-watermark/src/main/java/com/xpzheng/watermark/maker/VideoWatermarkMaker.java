@@ -54,10 +54,11 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
         }
         cmd.append("-filter_complex \"drawtext="); // 添加过滤器
         cmd.append(String.format("fontfile=%s: ", convertPath(fontPath))); // 字体
-        cmd.append(String.format("fontsize=%.1f: ", getBaseFontSize() * (1 + watermark.getSize() * getFontSizeGrowFactor()))); // 字号
+        cmd.append(String.format("fontsize=%.1f: ",
+                getBaseFontSize() * (1 + watermark.getSize() * getFontSizeGrowFactor()))); // 字号
         Color textColor = watermark.getTextColor();
-        cmd.append(String.format("fontcolor=%s: ",
-            CommonUtils.rgba2Hex(textColor.getR(), textColor.getG(), textColor.getB(), (int) (watermark.getOpacity() * 255)))); // 文字颜色
+        cmd.append(String.format("fontcolor=%s: ", CommonUtils.rgba2Hex(textColor.getR(), textColor.getG(),
+                textColor.getB(), (int) (watermark.getOpacity() * 255)))); // 文字颜色
         cmd.append(String.format("text='%s': ", watermark.getContent())); // 文本内容
         // 设置位置
         float x = watermark.getX(), y = watermark.getY();
@@ -110,8 +111,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cmd.append(String
-            .format(
+        cmd.append(String.format(
                 "-i %s -filter_complex \"[1:v][0:v]scale2ref=oh * %f:sqrt(main_w * main_h * %f * %f)[wm][video];[video][wm] overlay=",
                 filePath, ratio, watermark.getSize(), ratio)); // 添加过滤器
 
@@ -185,6 +185,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
      */
     @Override
     public float getFontSizeGrowFactor() {
-        return 4f;
+        return 8f;
     }
+
 }

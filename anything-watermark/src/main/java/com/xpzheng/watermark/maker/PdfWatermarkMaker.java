@@ -141,7 +141,8 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
                     layer.setGState(gs);
                 }
 
-                Rectangle2D bounds = MathUtils.getScaleBounds(mw, mh, img.getScaledWidth(), img.getScaledHeight(), size);
+                Rectangle2D bounds = MathUtils.getScaleBounds(mw, mh, img.getScaledWidth(), img.getScaledHeight(),
+                        size);
                 float iw = (float) bounds.getWidth(), ih = (float) bounds.getHeight();
 
                 Align xAlign = watermark.getxAlign(), yAlign = watermark.getyAlign();
@@ -194,7 +195,7 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
      */
     @Override
     public float getBaseFontSize() {
-        return 12f;
+        return 8f;
     }
 
     /*
@@ -204,6 +205,7 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
      */
     @Override
     public float getFontSizeGrowFactor() {
-        return 8f;
+        return 15f;
     }
+
 }

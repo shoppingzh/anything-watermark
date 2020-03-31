@@ -1,15 +1,16 @@
-//package com.xpzheng.watermark.maker;
-//
-//import java.io.File;
-//
-//import org.junit.jupiter.api.Test;
-//
-//import com.xpzheng.watermark.components.Watermark;
-//
-//public class VideoWatermarkMakerTest {
-//
-//    private static final File SRC = new File("d:/watermark/video/1.mp4");
-//
+package com.xpzheng.watermark.maker;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
+
+import com.xpzheng.watermark.components.Color;
+import com.xpzheng.watermark.components.Watermark;
+
+public class VideoWatermarkMakerTest {
+
+    private static final File SRC = new File("d:/watermark/video/1.mp4");
+
 //    @Test
 //    public void testPositionLeftTop() {
 //        Watermark watermark = new Watermark.Builder().leftTop().createText("左上角水印");
@@ -53,5 +54,17 @@
 //        Watermark watermark = new Watermark.Builder().center().opactiy(0.5f).createText("你好，水印！");
 //        new VideoWatermarkMaker(SRC, new File("d:/watermark/1-h264.mp4")).make(watermark);
 //    }
-//
-//}
+    
+    @Test
+  public void testDiffrentSizeWatermark() {
+      Watermark watermark = new Watermark.Builder()
+          .center()
+          .rotate(45)
+          .createText("你好，水印！", Color.valueOf("#fff"));
+      for(float size = 0.005f; size <= 0.2; size += 0.01f) {
+          watermark.setSize(size);
+          new VideoWatermarkMaker(SRC, new File("d:/watermark/video/1-" + size + ".mp4")).make(watermark);
+      }
+  }
+
+}

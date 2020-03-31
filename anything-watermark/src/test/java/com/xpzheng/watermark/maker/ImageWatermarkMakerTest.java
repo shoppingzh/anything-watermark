@@ -1,4 +1,4 @@
-package com.xpzheng.watermark.maker;
+/*package com.xpzheng.watermark.maker;
 
 import java.io.File;
 
@@ -155,11 +155,17 @@ public class ImageWatermarkMakerTest {
 //        }
 //    }
     
-    @Test
-    public void testDiffrentSizeWatermark() {
-        Watermark watermark = new Watermark.Builder()
-            .center()
-            .createText("你好，水印！");
-    }
+//    @Test
+//    public void testDiffrentSizeWatermark() {
+//        Watermark watermark = new Watermark.Builder()
+//            .center()
+//            .rotate(45)
+//            .createImage("d:/watermark/logo3.png");
+//        for(float size = 0.005f; size <= 0.2; size += 0.005f) {
+//            watermark.setSize(size);
+//            new ImageWatermarkMaker(SRC, new File("d:/watermark/image/1-" + size + ".jpg"), ImageWatermarkMaker.FORMAT_JPG).make(watermark);
+//        }
+//    }
     
 }
+*/

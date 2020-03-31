@@ -85,11 +85,6 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         Align xAlign = watermark.getxAlign(), yAlign = watermark.getyAlign();
         float tx = MathUtils.transCoord(x, mw), ty = MathUtils.transCoord(y, mh);
         float size = watermark.getSize();
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, watermark.getOpacity())); // 透明度(使用组合像素的方式)
-        final String text = watermark.getContent();
-        float textSize = 12f;
-        Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) textSize); // 字体样式、大小
-        g.setFont(f);
         // 计算该字体绘制出的水印高度，如果不足最小高度(或大于最大高度)，则自动伸缩到最佳高度
         if (size < MIN_TEXT_PERCENT) {
             size = MIN_TEXT_PERCENT;
@@ -97,6 +92,11 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         if (size > MAX_TEXT_PERCENT) {
             size = MAX_TEXT_PERCENT;
         }
+        final String text = watermark.getContent();
+        float textSize = 12f;
+        Font f = new Font(BASEFONT.getName(), Font.BOLD, (int) textSize); // 字体样式、大小
+        g.setFont(f);
+        
         final float textHeight = Math.min(mw, mh) * size;
         Rectangle2D originalBounds = g.getFontMetrics(f).getStringBounds(text, g);
         textSize = (float) (textSize * textHeight / originalBounds.getHeight());
@@ -124,6 +124,9 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         if (yAlign == Align.CENTER) {
             ty = ty - th / 2;
         }
+        
+        // 由于从底部开始绘制文字，需要再将y轴分量向下平移半个文字的高度；另外，处理基线的y轴偏移量
+        ty = ty + th / 2 + offsetY;
         // 边缘处理
         if (tx <= 0) {
             tx = EDGE_OFFSET;
@@ -135,9 +138,9 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         } else if (ty >= mh) {
             ty = mh - EDGE_OFFSET;
         }
-        // 旋转画笔
-        g.rotate(Math.toRadians(watermark.getRotation()), tx + tw / 2, ty - th / 2);
-        g.drawString(text, tx, ty - offsetY);
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, watermark.getOpacity())); // 透明度(使用组合像素的方式)
+        g.rotate(Math.toRadians(watermark.getRotation()), tx + tw / 2, ty - th / 2); // 旋转画笔
+        g.drawString(text, tx, ty);
         g.dispose(); // 释放内存
         writeToDest(); // 写出
     }
