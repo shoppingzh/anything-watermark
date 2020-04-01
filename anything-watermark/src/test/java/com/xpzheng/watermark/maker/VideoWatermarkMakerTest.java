@@ -55,17 +55,25 @@ public class VideoWatermarkMakerTest {
 //        new VideoWatermarkMaker(SRC, new File("d:/watermark/1-h264.mp4")).make(watermark);
 //    }
     
-    @Test
-  public void testDiffrentSizeWatermark() {
-      Watermark watermark = new Watermark.Builder()
+//    @Test
+//  public void testDiffrentSizeWatermark() {
+//      Watermark watermark = new Watermark.Builder()
+//          .center()
+//          .rotate(45)
+//          .createText("你好，水印！", Color.valueOf("#fff"));
+//      for(float size = 0.005f; size <= 0.2; size += 0.01f) {
+//          watermark.setSize(size);
+//          new VideoWatermarkMaker(SRC, new File("d:/watermark/video/1-" + size + ".mp4")).make(watermark);
+//      }
+//  }
+    
+    public void testEncode() {
+        Watermark watermark = new Watermark.Builder()
           .center()
           .rotate(45)
           .createText("你好，水印！", Color.valueOf("#fff"));
-      for(float size = 0.005f; size <= 0.2; size += 0.01f) {
-          watermark.setSize(size);
-          new VideoWatermarkMaker(SRC, new File("d:/watermark/video/1-" + size + ".mp4")).make(watermark);
-      }
-  }
+        new VideoWatermarkMaker(new File("d:/watermark/video/1.avi"), new File("d:/watermark/video/new.mp4.mv.mp3.avi"), true).make(watermark);
+    }
 
 }
 */

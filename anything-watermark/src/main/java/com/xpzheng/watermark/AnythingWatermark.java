@@ -19,8 +19,8 @@ import com.xpzheng.watermark.maker.WordWatermarkMaker;
 public class AnythingWatermark {
 
     private static final String[] PDF_SUFFIX = { "pdf" };
-    private static final String[] VIDEO_SUFFIX = { "mp4", "flv" };
-    private static final String[] IMAGE_SUFFIX = { "jpg", "jpeg", "webp", "png", "gif" };
+    private static final String[] VIDEO_SUFFIX = { "flv", "asf", "mpg", "3gp", "mov", "mp4", "asx", "rmvb", "wmv", "avi" };
+    private static final String[] IMAGE_SUFFIX = { "bmp", "tif", "ico", "jpg", "jpeg", "webp", "png", "gif" };
     private static final String[] WORD_SUFFIX = { "doc", "docx" };
 
     /**
@@ -33,7 +33,7 @@ public class AnythingWatermark {
      */
     public static void make(File src, File dest, Watermark watermark) throws WatermarkException {
         if (src == null || !src.exists()) {
-            throw new IllegalArgumentException("源文件不存在！");
+            throw new WatermarkException(WatermarkException.ERR_SOURCE_NOT_FOUND);
         }
         String filename = src.getName();
         boolean pdf = canWatermark(filename, PDF_SUFFIX);
@@ -54,12 +54,7 @@ public class AnythingWatermark {
         if (maker == null) {
             throw new WatermarkException(WatermarkException.ERR_UNSUPPORTED);
         }
-
-        try {
-            maker.make(watermark);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        maker.make(watermark);
     }
 
     /**

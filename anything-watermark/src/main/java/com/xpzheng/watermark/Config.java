@@ -7,13 +7,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.xpzheng.watermark.util.CommonUtils;
+
 /**
  * @author xpzheng
  *
  */
 public final class Config {
 
-    private static final String CONFIG_FILE = "anything-watermark.properties";
+    private static final String CONFIG_FILE = "skills.properties";
     private static Config config = new Config();
 
     private String ffmpegHome;
@@ -31,8 +33,8 @@ public final class Config {
         InputStream in = Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
         try {
             prop.load(in);
-            this.ffmpegHome = prop.getProperty("ffmpeg_home");
-            this.font = prop.getProperty("font");
+            this.ffmpegHome = prop.getProperty("skills.ffmpegtoolsdir");
+            this.font = CommonUtils.removeExtraSlash(this.ffmpegHome + "/font.ttf");
         } catch (IOException e) {
             e.printStackTrace();
         }

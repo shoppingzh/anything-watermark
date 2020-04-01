@@ -49,4 +49,16 @@ public class CommonUtils {
         FontMetrics fontMetrics = g.getFontMetrics(f);
         return fontMetrics.getStringBounds(text, g);
     }
+    
+    /**
+     * 去除文件路径中多余的左斜线(或右斜线)，如：<br>
+     * /usr//home -> /usr/home<br>
+     * d:\file\\image\1.jpg -> d:\file\image\1.jpg
+     * 
+     * @param filePath  文件路径
+     * @return
+     */
+    public static String removeExtraSlash(String filePath) {
+        return filePath == null ? null : filePath.replaceAll("[\\/\\\\]{2,}", "/");
+    }
 }

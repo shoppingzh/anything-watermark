@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ import com.xpzheng.watermark.util.CommonUtils;
 public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextGrowable {
 
     private static Logger LOG = LoggerFactory.getLogger(VideoWatermarkMaker.class);
-    private static final String FFMPEG = String.format("%s/ffmpeg.exe ", Config.getInstance().getFfmpegHome());
+    private static final String FFMPEG = CommonUtils.removeExtraSlash(String.format("%s/ffmpeg.exe ", Config.getInstance().getFfmpegHome()));
 
     /**
      * 是否在加水印同时进行h264转码，默认同时转码
@@ -85,7 +86,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append(" - text_h");
         }
         cmd.append("): \" ");
-        cmd.append(String.format("-y %s ", dest.getAbsolutePath()));
+        cmd.append(String.format("-y %s ", getOutputPath()));
         execute(cmd.toString());
     }
 
@@ -138,7 +139,7 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append(" - overlay_h");
         }
         cmd.append("): \"");
-        cmd.append(String.format("-y %s ", dest.getAbsolutePath()));
+        cmd.append(String.format("-y %s ", getOutputPath()));
         execute(cmd.toString());
     }
 
@@ -159,7 +160,22 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append("-pix_fmt yuv420p -c:v libx264 -strict -2 "); // h264编码
         }
     }
-
+    
+    /**
+     * 获取视频文件的文件路径(如果作H264编码则改名为mp4后缀)
+     * @return
+     */
+    private String getOutputPath() {
+        String outputPath = this.dest.getAbsolutePath();
+        if (this.encodeH264) {
+            String extension = FilenameUtils.getExtension(outputPath);
+            if (!"mp4".equals(extension)) {
+                outputPath = outputPath.substring(0, outputPath.lastIndexOf(extension)) + "mp4";
+            }
+        }
+        return outputPath;
+    }
+    
     private void execute(String cmd) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("执行命令：{}", cmd.toString());
