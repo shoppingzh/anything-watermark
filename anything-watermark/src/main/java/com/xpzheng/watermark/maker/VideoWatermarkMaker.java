@@ -46,19 +46,15 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
 
     @Override
     protected void makeForText(TextWatermark watermark) {
-        StringBuilder cmd = new StringBuilder(FFMPEG);
+        StringBuilder cmd = new StringBuilder();
+        prepareCmdStatement(cmd);
         String fontPath = Config.getInstance().getFont();
-        cmd.append(String.format("-i %s ", src.getAbsolutePath())); // 输入视频
-        if (this.encodeH264) {
-            cmd.append("-pix_fmt yuv420p -c:v libx264 -strict -2 "); // h264编码
-        }
         cmd.append("-filter_complex \"drawtext="); // 添加过滤器
         cmd.append(String.format("fontfile=%s: ", convertPath(fontPath))); // 字体
-        cmd.append(String.format("fontsize=%.1f: ",
-                getBaseFontSize() * (1 + watermark.getSize() * getFontSizeGrowFactor()))); // 字号
+        cmd.append(String.format("fontsize=%.1f: ", getBaseFontSize() * (1 + watermark.getSize() * getFontSizeGrowFactor()))); // 字号
         Color textColor = watermark.getTextColor();
-        cmd.append(String.format("fontcolor=%s: ", CommonUtils.rgba2Hex(textColor.getR(), textColor.getG(),
-                textColor.getB(), (int) (watermark.getOpacity() * 255)))); // 文字颜色
+        cmd.append(String.format("fontcolor=%s: ",
+            CommonUtils.rgba2Hex(textColor.getR(), textColor.getG(), textColor.getB(), (int) (watermark.getOpacity() * 255)))); // 文字颜色
         cmd.append(String.format("text='%s': ", watermark.getContent())); // 文本内容
         // 设置位置
         float x = watermark.getX(), y = watermark.getY();
@@ -89,18 +85,14 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append(" - text_h");
         }
         cmd.append("): \" ");
-        cmd.append(String.format("%s ", dest.getAbsolutePath()));
-        LOG.debug("执行命令：{}", cmd.toString());
-        CmdUtils.execute(cmd.toString());
+        cmd.append(String.format("-y %s ", dest.getAbsolutePath()));
+        execute(cmd.toString());
     }
 
     @Override
     protected void makeForImage(ImageWatermark watermark) {
-        StringBuilder cmd = new StringBuilder(FFMPEG);
-        cmd.append(String.format("-i %s ", src.getAbsolutePath())); // 输入视频
-        if (this.encodeH264) {
-            cmd.append("-pix_fmt yuv420p -c:v libx264 -strict -2 "); // h264编码
-        }
+        StringBuilder cmd = new StringBuilder();
+        prepareCmdStatement(cmd);
         String filePath = watermark.getFile().getAbsolutePath();
         float ratio = 1;
         try {
@@ -111,7 +103,8 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cmd.append(String.format(
+        cmd.append(String
+            .format(
                 "-i %s -filter_complex \"[1:v][0:v]scale2ref=oh * %f:sqrt(main_w * main_h * %f * %f)[wm][video];[video][wm] overlay=",
                 filePath, ratio, watermark.getSize(), ratio)); // 添加过滤器
 
@@ -145,9 +138,8 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
             cmd.append(" - overlay_h");
         }
         cmd.append("): \"");
-        cmd.append(String.format("%s ", dest.getAbsolutePath()));
-        LOG.debug("执行命令：{}", cmd.toString());
-        CmdUtils.execute(cmd.toString());
+        cmd.append(String.format("-y %s ", dest.getAbsolutePath()));
+        execute(cmd.toString());
     }
 
     /**
@@ -158,6 +150,26 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
      */
     private static String convertPath(String path) {
         return path == null ? null : path.replaceAll("\\\\", "/").replaceAll(":", "\\\\\\\\:");
+    }
+
+    private void prepareCmdStatement(StringBuilder cmd) {
+        cmd.append(FFMPEG);
+        cmd.append(String.format("-i %s ", src.getAbsolutePath())); // 输入视频
+        if (this.encodeH264) {
+            cmd.append("-pix_fmt yuv420p -c:v libx264 -strict -2 "); // h264编码
+        }
+    }
+
+    private void execute(String cmd) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("执行命令：{}", cmd.toString());
+        }
+        try {
+            CmdUtils.execute(cmd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.dest.delete();
+        }
     }
 
     public boolean isEncodeH264() {
@@ -187,5 +199,4 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
     public float getFontSizeGrowFactor() {
         return 8f;
     }
-
 }
