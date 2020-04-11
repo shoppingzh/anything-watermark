@@ -136,7 +136,10 @@
 </template>
 
 <script>
+import mixins from '@/mixins'
+
 export default {
+  mixins: mixins,
   props: {
     
   },
@@ -156,8 +159,7 @@ export default {
         image: null
       },
       fast: false,
-      positionSetting: false,
-      apiPath: process.env.NODE_ENV == 'development' ? 'http://localhost:8080/api' : ''
+      positionSetting: false
     }
   },
   computed: {

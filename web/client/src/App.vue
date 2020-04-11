@@ -68,9 +68,11 @@
 import WatermarkDesigner from './components/WatermarkDesigner'
 import http from '@/utils/http'
 import pdf from 'vue-pdf'
+import mixins from '@/mixins'
 
 export default {
   name: 'App',
+  mixins: mixins,
   components: {
     WatermarkDesigner,
     pdf
@@ -82,7 +84,6 @@ export default {
       src: null,
       result: null,
       moreAction: false,
-      apiPath: process.env.NODE_ENV == 'development' ? 'http://localhost:8080/api' : ''
     }
   },
   computed: {
