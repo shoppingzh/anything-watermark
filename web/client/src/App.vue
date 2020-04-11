@@ -11,7 +11,7 @@
         <Upload
           v-if="step === 0"
           type="drag"
-          action="/file/upload"
+          :action="apiPath + '/file/upload'"
           :on-success="handleUploaded"
           :on-error="handleUploadError">
             <div style="padding: 60px 0">
@@ -81,7 +81,8 @@ export default {
       designing: false,
       src: null,
       result: null,
-      moreAction: false
+      moreAction: false,
+      apiPath: process.env.NODE_ENV == 'development' ? 'http://localhost:8080/api' : ''
     }
   },
   computed: {
@@ -103,7 +104,7 @@ export default {
       return 'image'
     },
     resultSrc() {
-      return `/watermark/${this.result}`
+      return this.apiPath + `/watermark/${this.result}`
     }
   },
   methods: {

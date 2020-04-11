@@ -92,6 +92,10 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
                 } else if (ty + th >= mh) {
                     ty = mh - this.edgeOffset;
                 }
+//                if (watermark.getRotation() % 360 != 0) {
+//                    tx = tx + tw / 2;
+//                    ty = tx + th / 2;
+//                }
                 ColumnText.showTextAligned(layer, Element.ALIGN_LEFT, p, tx, ty, -watermark.getRotation());
             }
         } catch (DocumentException | IOException e) {

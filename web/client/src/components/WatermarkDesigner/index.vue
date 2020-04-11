@@ -30,7 +30,7 @@
           </FormItem>
           <FormItem v-show="conf.type == 2">
             <template #label><Icon type="md-image" /> 水印图片</template>
-            <Upload action="/file/upload" :on-success="handleImageUploaded">
+            <Upload :action="apiPath + '/file/upload'" :on-success="handleImageUploaded">
                 <Button icon="ios-cloud-upload-outline">选择文件</Button>
             </Upload>
           </FormItem>
@@ -156,7 +156,8 @@ export default {
         image: null
       },
       fast: false,
-      positionSetting: false
+      positionSetting: false,
+      apiPath: process.env.NODE_ENV == 'development' ? 'http://localhost:8080/api' : ''
     }
   },
   computed: {
@@ -186,7 +187,7 @@ export default {
     },
     imageUrl() {
       const image = this.conf.image
-      return image ? `/upload/${image}` : null
+      return image ? this.apiPath + `/upload/${image}` : null
     },
     styles: function() {
       

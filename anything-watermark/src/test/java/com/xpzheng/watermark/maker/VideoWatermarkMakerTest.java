@@ -1,4 +1,4 @@
-package com.xpzheng.watermark.maker;
+/*package com.xpzheng.watermark.maker;
 
 import java.io.File;
 
@@ -68,3 +68,4 @@ public class VideoWatermarkMakerTest {
   }
 
 }
+*/
