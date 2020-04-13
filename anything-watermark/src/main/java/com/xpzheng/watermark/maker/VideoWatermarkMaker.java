@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.xpzheng.watermark.AbstractWatermarkMaker;
 import com.xpzheng.watermark.Config;
 import com.xpzheng.watermark.TextGrowable;
+import com.xpzheng.watermark.WatermarkException;
 import com.xpzheng.watermark.components.Align;
 import com.xpzheng.watermark.components.Color;
 import com.xpzheng.watermark.components.ImageWatermark;
@@ -176,15 +177,15 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
         return outputPath;
     }
     
-    private void execute(String cmd) {
+    private void execute(String cmd) throws WatermarkException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("执行命令：{}", cmd.toString());
         }
         try {
             CmdUtils.execute(cmd);
         } catch (Exception e) {
-            e.printStackTrace();
             this.dest.delete();
+            throw new WatermarkException(WatermarkException.ERR_INNER_ERROR);
         }
     }
 
