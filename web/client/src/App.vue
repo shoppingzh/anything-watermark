@@ -11,7 +11,7 @@
         <Upload
           v-if="step === 0"
           type="drag"
-          action="/file/upload"
+          :action="apiPath + '/file/upload'"
           :on-success="handleUploaded"
           :on-error="handleUploadError">
             <div style="padding: 60px 0">
@@ -68,9 +68,11 @@
 import WatermarkDesigner from './components/WatermarkDesigner'
 import http from '@/utils/http'
 import pdf from 'vue-pdf'
+import mixins from '@/mixins'
 
 export default {
   name: 'App',
+  mixins: mixins,
   components: {
     WatermarkDesigner,
     pdf
@@ -81,7 +83,7 @@ export default {
       designing: false,
       src: null,
       result: null,
-      moreAction: false
+      moreAction: false,
     }
   },
   computed: {
@@ -103,7 +105,7 @@ export default {
       return 'image'
     },
     resultSrc() {
-      return `/watermark/${this.result}`
+      return this.apiPath + `/watermark/${this.result}`
     }
   },
   methods: {

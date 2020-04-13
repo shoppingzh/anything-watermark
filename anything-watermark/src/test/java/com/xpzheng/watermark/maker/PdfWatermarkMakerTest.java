@@ -1,4 +1,4 @@
-/*package com.xpzheng.watermark.maker;
+package com.xpzheng.watermark.maker;
 
 import java.io.File;
 
@@ -81,6 +81,15 @@ public class PdfWatermarkMakerTest {
 //            new PdfWatermarkMaker(SRC, new File("d:/watermark/pdf/1-" + size + ".pdf")).make(watermark);
 //        }
 //    }
+    
+    public void testLargerSize() {
+        Watermark watermark = new Watermark.Builder()
+                .center()
+                .size(0.5f)
+//                .rotate(45)
+                .createText("你好，水印");
+//                .createImage("d:/watermark/logo3.png");
+        new PdfWatermarkMaker(SRC, new File("d:/watermark/pdf/1-larger.pdf")).make(watermark);
+    }
 
 }
-*/
