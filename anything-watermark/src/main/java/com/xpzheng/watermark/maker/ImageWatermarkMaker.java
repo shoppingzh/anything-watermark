@@ -77,6 +77,13 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         this.format = format;
     }
 
+    /**
+     * 位置：√
+     * 大小：√
+     * 旋转：√
+     * 透明：√
+     * 颜色：√
+     */
     @Override
     protected void makeForText(TextWatermark watermark) {
         Graphics2D g = srcImage.createGraphics();
@@ -145,6 +152,12 @@ public class ImageWatermarkMaker extends AbstractWatermarkMaker {
         writeToDest(); // 写出
     }
 
+    /**
+     * 位置：√
+     * 大小：√
+     * 旋转：√
+     * 透明：√
+     */
     @Override
     protected void makeForImage(ImageWatermark watermark) {
         Graphics2D g = srcImage.createGraphics();

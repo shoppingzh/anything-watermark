@@ -39,6 +39,14 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
         super(src, dest);
     }
 
+    /**
+     * 位置：√
+     * 大小：√
+     * 旋转：√
+     * 透明：√
+     * 颜色：√
+     * 层级：√
+     */
     @Override
     protected void makeForText(TextWatermark watermark) {
         PdfReader reader = null;
@@ -92,10 +100,6 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
                 } else if (ty + th >= mh) {
                     ty = mh - this.edgeOffset;
                 }
-//                if (watermark.getRotation() % 360 != 0) {
-//                    tx = tx + tw / 2;
-//                    ty = tx + th / 2;
-//                }
                 ColumnText.showTextAligned(layer, Element.ALIGN_LEFT, p, tx, ty, -watermark.getRotation());
             }
         } catch (DocumentException | IOException e) {
@@ -114,6 +118,13 @@ public class PdfWatermarkMaker extends AbstractWatermarkMaker implements TextGro
         }
     }
 
+    /**
+     * 位置：√
+     * 大小：√
+     * 旋转：×
+     * 透明：√
+     * 层级：√
+     */
     @Override
     protected void makeForImage(ImageWatermark watermark) {
         final float size = watermark.getSize();

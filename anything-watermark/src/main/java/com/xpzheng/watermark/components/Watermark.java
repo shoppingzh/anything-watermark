@@ -3,7 +3,19 @@ package com.xpzheng.watermark.components;
 import java.io.File;
 
 /**
- * 水印
+ * 水印<br>
+ * 设置项：<br>
+ * x             横轴位置([0, 1]之间表示占横轴的百分比，负值表示反向位置)<br>
+ * y             纵轴位置(同x)<br>
+ * xAlign        横轴的对齐方式，可选左、中、右，将影响水印的绘制位置<br>
+ * yAlign        见yAlign<br>
+ * size          水印的大小，建议设置范围：[0.005 - 0.2]之间<br>
+ * rotation      旋转角度<br>
+ * opacity       不透明度(alpha = 100 - opactity)<br>
+ * front         是否位于内容之上<br>
+ * text          文字水印的内容<br>
+ * textColor     文字水印的颜色<br>
+ * image         图片水印的文件位置<br>
  * 
  * @author xpzheng
  *

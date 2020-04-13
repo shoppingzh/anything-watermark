@@ -46,6 +46,12 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
         this.encodeH264 = encodeH264;
     }
 
+    /**
+     * 位置：√
+     * 大小：√
+     * 旋转：×
+     * 透明：√
+     */
     @Override
     protected void makeForText(TextWatermark watermark) {
         StringBuilder cmd = new StringBuilder();
@@ -91,6 +97,12 @@ public class VideoWatermarkMaker extends AbstractWatermarkMaker implements TextG
         execute(cmd.toString());
     }
 
+    /**
+     * 位置：√
+     * 大小：√
+     * 旋转：×
+     * 透明：×
+     */
     @Override
     protected void makeForImage(ImageWatermark watermark) {
         StringBuilder cmd = new StringBuilder();
