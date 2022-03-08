@@ -6,7 +6,7 @@
   <version>0.0.1</version>
 
   <properties>
-    <poi.version>3.16</poi.version>
+    <poi.version>5.2.1</poi.version>
   </properties>
 
   <dependencies>
